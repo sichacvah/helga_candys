@@ -14,21 +14,22 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
-AWS_BUCKET = 's3.amazonaws.com'
+AWS_BUCKET = 's3-us-east-1'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
-AWS_KEY = 'AKIAJLIXWO6J55ICEB7Q'
-AWS_SECRET = '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'
+
+AWS_ACCESS_KEY                  = ENV['AWS_ACCESS_KEY']
+AWS_SECRET                      = ENV['AWS_SECRET']
 
 activate :s3_sync do |s3_sync|
 	s3_sync.bucket = AWS_BUCKET
-	s3_sync.aws_access_key_id = AWS_KEY
+	s3_sync.aws_access_key_id =  AWS_ACCESS_KEY
 	s3_sync.aws_secret_access_key = AWS_SECRET
 	s3_sync.delete = false
 end
 
 activate :cloudfront do |cf|
-	cf.access_key_id                    = AWS_KEY
+	cf.access_key_id                    = AWS_ACCESS_KEY
 	cf.secret_access_key                = AWS_SECRET
 	cf.distribution_id                  = AWS_CLOUDFRONT_DISTRIBUTION_ID
 end
