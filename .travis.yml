@@ -9,6 +9,5 @@ deploy:
     access_key_id: <%= ENV["AWS_KEY_ID"] %>
     secret_access_key: <%= ENV["AWS_SECRET"] %>
     region: 'eu-central-1'
-    revision_type: 'github'
     bucket: 'helgacandys'
     application: 'helga_candys'
