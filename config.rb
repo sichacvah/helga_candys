@@ -14,7 +14,7 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
-AWS_BUCKET = 'helgacandys.s3.amazonaws.com'
+AWS_BUCKET = 'helgacandys'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
 
@@ -25,6 +25,7 @@ activate :s3_sync do |s3_sync|
 	s3_sync.bucket = AWS_BUCKET
 	s3_sync.aws_access_key_id =  AWS_ACCESS_KEY
 	s3_sync.aws_secret_access_key = AWS_SECRET
+	s3_sync.region                     = 'eu-central-1'
 	s3_sync.delete = false
 end
 
