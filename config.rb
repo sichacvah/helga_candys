@@ -33,6 +33,7 @@ activate :cloudfront do |cf|
 	cf.access_key_id                    = AWS_ACCESS_KEY
 	cf.secret_access_key                = AWS_SECRET
 	cf.distribution_id                  = AWS_CLOUDFRONT_DISTRIBUTION_ID
+
 end
 
 activate :blog do |blog|
