@@ -1,0 +1,41 @@
+nav {
+	border-bottom: 1px solid $base-border-color;
+	margin: em(30) 0;
+	text-align: center;
+
+	ul {
+		text-align:center;
+		display: inline-block;
+		margin-bottom: em(10);
+	}
+
+	li {
+		display: block;
+		float: left;
+		padding: em(10);
+		a {
+			color: $base-font-color;
+			letter-spacing: 2px;
+		}
+	}
+
+	.blog-title {
+		.blog-image {
+			background-image: url('../images/helga.jpg');
+			height: 150px;
+			width: 150px;
+			margin: 0 auto;
+			border-radius: 50%;
+			margin-bottom: em(10);
+		}
+		font-size: 1.4em;
+		font-weight: 700;
+		letter-spacing: 4px;
+		text-transform: uppercase;
+		span {
+			color: $base-font-color;
+		}
+	}
+}
+
+

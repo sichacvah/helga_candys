@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/middleman/middleman-livereload.git
+  revision: 0f0d7111ec82b8864871ecb7c2a8e2f7755b0d10
+  specs:
+    middleman-livereload (3.4.6)
+      em-websocket (~> 0.5.1)
+      middleman-core (>= 3.3)
+      rack-livereload (~> 0.3.15)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -9,6 +18,13 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.4.0)
     backports (3.6.7)
+    bitters (1.2.0)
+      bourbon (>= 4.2)
+      sass (>= 3.4)
+      thor
+    bourbon (4.2.6)
+      sass (~> 3.4)
+      thor (~> 0.19)
     builder (3.2.2)
     capybara (2.5.0)
       mime-types (>= 1.16)
@@ -24,16 +40,22 @@ GEM
       sass (>= 3.2, < 3.5)
     concurrent-ruby (0.9.2)
     contracts (0.12.0)
+    em-websocket (0.5.1)
+      eventmachine (>= 0.12.9)
+      http_parser.rb (~> 0.6.0)
     erubis (2.7.0)
+    eventmachine (1.0.9.1)
     execjs (2.6.0)
     fastimage (1.8.1)
       addressable (~> 2.3, >= 2.3.5)
     ffi (1.9.10)
+    git-version-bump (0.15.1)
     haml (4.0.7)
       tilt
     hamster (2.0.0)
       concurrent-ruby (~> 0.8)
     hashie (3.4.3)
+    http_parser.rb (0.6.0)
     i18n (0.7.0)
     json (1.8.3)
     kramdown (1.9.0)
@@ -78,6 +100,9 @@ GEM
     mime-types-data (3.2015.1120)
     mini_portile2 (2.0.0)
     minitest (5.8.4)
+    neat (1.7.2)
+      bourbon (>= 4.0)
+      sass (>= 3.3)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
     padrino-helpers (0.13.1)
@@ -87,6 +112,11 @@ GEM
     padrino-support (0.13.1)
       activesupport (>= 3.1)
     rack (1.6.4)
+    rack-contrib (1.4.0)
+      git-version-bump (~> 0.15)
+      rack (~> 1.4)
+    rack-livereload (0.3.16)
+      rack
     rack-test (0.6.3)
       rack (>= 1.0)
     rb-fsevent (0.9.7)
@@ -109,9 +139,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bitters
+  bourbon
   builder (~> 3.0)
   middleman (~> 4.0.0)
   middleman-blog
+  middleman-livereload!
+  neat
+  rack-contrib
   redcarpet (~> 3.3, >= 3.3.3)
   tzinfo-data
   wdm (~> 0.1.0)
