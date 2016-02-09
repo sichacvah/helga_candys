@@ -14,7 +14,7 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
-AWS_BUCKET = 's3-us-east-1'
+AWS_BUCKET = 'helgacandys.s3.amazonaws.com'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
 
