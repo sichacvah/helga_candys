@@ -9,7 +9,7 @@ gem 'wdm', '~> 0.1.0', platforms: [:mswin, :mingw]
 gem 'tzinfo-data', platforms: [:mswin, :mingw, :jruby]
 
 # Middleman Gems
-gem "middleman", "~> 4.0.0"
+gem "middleman"
 gem "middleman-blog"
 
 gem 'redcarpet', '~> 3.3', '>= 3.3.3'
@@ -17,7 +17,7 @@ gem 'redcarpet', '~> 3.3', '>= 3.3.3'
 # For feed.xml.builder
 gem "builder", "~> 3.0"
 
-gem "middleman-livereload", :github => "middleman/middleman-livereload"
+gem "middleman-livereload"
 
 gem 'rack-contrib'
 
@@ -27,3 +27,8 @@ gem 'bitters'
 gem 'neat'
 
 gem 'bourbon'
+
+gem 'middleman-aws'
+
+gem 'middleman-s3_sync'
+gem 'middleman-cloudfront'
