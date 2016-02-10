@@ -1,8 +1,7 @@
 language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
-before_script: bundle install --path vendor/bundle
-script: rake mm:publish
+script: bundle exec rake mm:publish
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
