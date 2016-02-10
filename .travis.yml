@@ -2,7 +2,7 @@ language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
 script: 
-  - pre_build.sh
+  - ./pre_build.sh
   - bundle exec rake mm:publish
 deploy:
   provider: s3
