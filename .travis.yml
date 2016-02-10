@@ -1,6 +1,7 @@
 language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
+before_script: bundle
 script: rake mm:build
 deploy:
   provider: s3
