@@ -5,11 +5,12 @@ script: echo HELGA
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
-  secret_access_key: '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'
   bucket: helgacandys
   local-dir: build
   skip_cleanup: true
-  region: 'eu-central-1'
+  region: eu-central-1
   on:
     repo: sichacvah/helga_candys.github.io
     tags: true
+  secret_access_key: 
+    secure: jxpcOEtiMbFxKlsGT3Ux54pQIc7FgDT8pVAq0ls2Ba+coCPxEODUzlfsg186qiZbG4jNP6C79qXW+VJBujlva9SoFRY/WtipqSmJb58qtRvVUwJqU2zpP1RtEMLI/xKRPtCJtiNiwPGWAjfgqrtWX36TZbmwt1n0SCX9kQRPqbUQn/DaAxhM6Z7xSzTJWgmVKH69X9hDw3eSsP61C9oC4eq87C6m2wbYN/zQiY3Aoxt2cWQX7IugtRmyssWG5xe76x4NF2CM2i919w+/QeOu9irrCvrTraT7aunDYxyncEEcFpJ/ZDBLUatClHY60c552kJkp/OFXKsnrTDrMiYp+evrurKdMiHSrs8+QjvjfkTY4SNad10ICFLQQ3lbHXi//AW2UGvJiMlwL0GziNf5zbjUVj4OfleepD/pvFi8HlnKlzd3SVRxCZYIYJUIU+t9WApSSgRd+RS2VeCUde9lbb9Y5ZxcoXTzqhrb91j6vKspujSrp3/Xu/UgIrPPbLcWGVJQQLlphGufsHfSx8063eNokS3Sxs22YDZ1YDyES8fnn/ZOEFfeXtA8CvpRbBkw1RQR1q4oyzM8KhzQAySydvPXzskLAwa9wkTvGAOFQNMnSVhvKM8hS05JJDoSRbIpvOSgMAGM2xp1cVlsylxt15InXlZqkB9fXr/wjR6GIos=
