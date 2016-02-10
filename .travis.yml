@@ -1,6 +1,7 @@
 language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
+before_script: mkdir ~/.aws && touch ~/.aws/helga_candys.yml && 'access_key_id: AKIAIBSUSMQSKA2RKBXA\nsecret_access_key<%= ENV["AWS+SECRET"] %>' >> ~/.aws/helga_candys.yml
 script: bundle exec rake mm:publish
 deploy:
   provider: s3
