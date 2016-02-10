@@ -4,7 +4,7 @@ gemfile: Gemfile
 script: 
   - chmod +x pre_build.sh
   - ./pre_build.sh
-  - bundle exec rake mm:publish
+  - bundle exec rake mm:deploy
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
