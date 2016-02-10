@@ -1,11 +1,10 @@
 language: ruby
-rvm:
-- 2.1.1
+rvm: 2.1.1
 gemfile: Gemfile
 script: echo DEPLOY!!
 deploy:
   matrix:
-  - provider: s3
+    provider: s3
     region: eu-central-1
     bucket: helgacandys
     application: helga_candys
