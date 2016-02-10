@@ -4,6 +4,7 @@ gemfile: Gemfile
 script: 
   - chmod +x pre_build.sh
   - ./pre_build.sh
+  - bundle exec rake mm:build
   - bundle exec rake mm:deploy
 deploy:
   provider: s3
