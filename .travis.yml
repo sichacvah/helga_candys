@@ -1,8 +1,7 @@
 language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
-before_script: 'mkdir ~/.aws && touch ~/.aws/helga_candys.github.io.yml && mv helga_candys.github.io.yml  ~/.aws/helga_candys.github.io.yml'
-script: bundle exec rake mm:publish
+script: echo HELGA
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
@@ -13,3 +12,4 @@ deploy:
   region: 'eu-central-1'
   on:
     repo: sichacvah/helga_candys.github.io
+    tags: true
