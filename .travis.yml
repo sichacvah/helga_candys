@@ -3,16 +3,12 @@ rvm: 2.1.1
 gemfile: Gemfile
 script: echo DEPLOY!!
 deploy:
-  matrix:
-    provider: s3
-    region: eu-central-1
-    bucket: helgacandys
-    application: helga_candys
-    on:
-      branch: master
-      repo: sichacvah/helga_candys.github.io
-      tags: true
-    secret_access_key:
-      secure: bVY6EJcE5uM/zYu9yFMKSttwbfPbYH3lB27YlmWK06rCb9R+wEuvigJMpAA8/ngdbv5Ytz601s73rg81D2XEjqzRWTVTNJK+5bxPDalgfI7AWXOFfv33YoaECFXXOBlP2Wq1sHQlU2uJfoGWBLzefVLf8WZtYEhwGnRZnRKCywxpvwYbDIIgw8kyUZXNZxCMq7LDXWpXys3eNeYlr6LGf6d9NOxvxWyzgTa+H2cVYMXT3QdZmtUn862l+LKHXIkrg2bMS9n0vYjuH/BySTFKTNzcRIC4SobaH85zlqpLM+H2h5HVKWsbRJDfVi/qyXppz6BeEDbFkI+VIFv2VMfJGjYcO3p7j4Mgf6HzN9U2JbWBTxFH4oqRQZyGDgvc/9j8QPkYSNAk1HADLSdiSmuMTJFyTRcD5UNt3Y87I28Jm+cUFFB5kF8/nnIxlwIB0QHL/qUgnmdyVE1QtZO2VffIsjzep9DMyRQIqcqZY57ypmFjRHRdVH4NisE/0G5JSqTwKbDmooQisXZmgAEH9zOZ1cE9wWv6UFRODEVXN845ts8ZZFouFo4r+ap5Yq2rGNrd3gBovdJR1DEwjCkrooC9sN3m7tZoFMvApYf9uolvRUw3yf3LCEwz8vofa4NE4EjdrMiECBU3czgAHaAY8WHFpLrGo+ZpLXQn7GgnZpEA28A=
-    access_key_id:
-      secure: IoxkwIXnUwPRLGAP2e50UTMILn/FkRBjNLlq6upLUxGvs+VcdIAzg7d7O7e3CNe5jIxgHAScKXuAZu+r8oOXqifAHZlnPPrEZICXbaPoOcvJb0+ebgJ1goKmOyYjJpgZGhoN3qvf1klDkkJ1vHfY/RizBE0S9P2LhEw+2HeXkC45vUgATs+IEvsmBgY+WDcwOcasv+dlZA6KZq9o8bAj6ETCe8hjcWWkwV6sUVYJqJWo2SEq44nWAPTmBQGvt9yCKBSrHXh0GTxoVvvgYeGdfqBAiMJt0LMYxCyT5yeMnpkLJR8GXuH6abMfljY38ZBn5r3Xb9Z0KrBUkSswReEt+3QQ+WLMgyRcdnlP5lRhodU+0hTUwY/YaDfJRNEwuBKFK7Qxq/nFSTlOEuTIR3K7CX9OwNBhfE3Iw+MD+e7ZHzhuwekqtronXw/rKevtU2LT4PaQJknjbGE6DSn8VnyS840+zBjL2D6m8T0tJq9ePXmaDM66YNkXaI0woFFRvg1Tigh2mLlDyp3172EU1epn2Tfbyi6KKwh/sk49J7++Qzoqj0EvW6s/zjfVj7t/jVM/JEqUaM+QzsYzblCcSIr/fRuvrFNa/N1jWyj+qWYxW7znQzhqUMbudXHy+Jag8H1SjqkofbDK36mJ/89+ig1XwkjGfNd2uAszA8UOOX85mqo=
+  provider: s3
+  access_key_id: AKIAIBSUSMQSKA2RKBXA
+  secret_access_key:
+    secure: iZVlwNu40Xmbvm3AqFEbo2RPFwb2v4N5+bGkhPgMlEnE5osKGWhcAXSA7xH0kNIdrSikF+JEJx47wjmQzTm6myV4gZfyicAKcSh3HTVTpfi4GSMFbwXyeAOUwjX01H1A8swOBczBsPXaEsSNpWauAOTpRlCTpqeDV9Nt/eW99PpYby6oZifhvntYt7Dwx4h6Pc9boSS1LJ3sC9JrWV+2Jqgr3IB17tJ4ccEUi/V28koxXCm+cH59gEs/t+LOLerqSwoLkZ+H/tlivWqFyJRAtoHwWR8mcguOcpbGoqhdPmw66RbADS9Q7/CqfSly+riDD3ABBqXpOtdM22X3JqjSR1FOpi+ZjX/CapXCoc/qgWwu+gQErT8qgwnvdvqHUWcEyb4eHy2yblkyTYexgLajlP8d2M4/7XAGHda/ZuKqhb9QOn7ab7UNvh/EfmzJOSJU4InM2LRfv96Rjq5fdny4uf8iDObR7IdiLbN53VpW1HmyfyK2WjXpp7jM3z1mPgr1dG3UM8lrjy2AVmISCvb3GcB18SMH+fHg5r9jgguNZJHMegk4/Iiceh12HaEoFQtc14r7a6Qwc8+FaNb/r87OqeGARkU1Zk8hAiT4uGmO3xsRfyZ7pKSIoD0h+IBBt3Bj7oroQAkeMvXCgquQDNItA7isPK96VPdn22zDUoXUDUY=
+  bucket: helgacandys
+  local-dir: build
+  acl: ''
+  on:
+    repo: sichacvah/helga_candys
