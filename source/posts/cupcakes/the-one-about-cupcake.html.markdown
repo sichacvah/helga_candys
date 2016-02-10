@@ -18,7 +18,7 @@ look like:
 SPLIT_SUMMARY_BEFORE_THIS
 Note that --- not considering the asterisk --- the actual text
 content starts at 4-columns in.
-
+THIS IS SPARTA
 > Block quotes are
 > written like so.
 >
