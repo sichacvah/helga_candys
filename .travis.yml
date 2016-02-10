@@ -6,7 +6,7 @@ script: bundle exec rake mm:publish
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
-  secret_access_key: <%= ENV["AWS_SECRET"] %>
+  secret_access_key: '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'
   bucket: helgacandys
   local-dir: build
   skip_cleanup: true
