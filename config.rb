@@ -36,6 +36,11 @@ activate :cloudfront do |cf|
 
 end
 
+activate :deploy do |deploy|
+	deploy.method = :git
+	deploy.branch = "master"
+end
+
 activate :blog do |blog|
   blog.tag_template = "tag.html"
   blog.calendar_template = "calendar.html"

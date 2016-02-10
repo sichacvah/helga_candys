@@ -32,3 +32,5 @@ gem 'middleman-aws'
 
 gem 'middleman-s3_sync'
 gem 'middleman-cloudfront'
+
+gem 'middleman-deploy'
