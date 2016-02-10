@@ -317,6 +317,7 @@ DEPENDENCIES
   middleman-s3_sync
   neat
   rack-contrib
+  rake
   redcarpet (~> 3.3, >= 3.3.3)
   tzinfo-data
   wdm (~> 0.1.0)
