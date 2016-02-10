@@ -33,12 +33,11 @@ activate :cloudfront do |cf|
 	cf.access_key_id                    = AWS_ACCESS_KEY
 	cf.secret_access_key                = AWS_SECRET
 	cf.distribution_id                  = AWS_CLOUDFRONT_DISTRIBUTION_ID
-
 end
 
 activate :deploy do |deploy|
 	deploy.method = :git
-	deploy.branch = "master"
+	deploy.branch = 'gh-pages'
 end
 
 activate :blog do |blog|
