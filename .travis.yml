@@ -5,8 +5,7 @@ script: bundle exec rake mm:publish
 deploy:
   provider: s3
   access_key_id: AKIAIBSUSMQSKA2RKBXA
-  secret_access_key:
-    secure: iZVlwNu40Xmbvm3AqFEbo2RPFwb2v4N5+bGkhPgMlEnE5osKGWhcAXSA7xH0kNIdrSikF+JEJx47wjmQzTm6myV4gZfyicAKcSh3HTVTpfi4GSMFbwXyeAOUwjX01H1A8swOBczBsPXaEsSNpWauAOTpRlCTpqeDV9Nt/eW99PpYby6oZifhvntYt7Dwx4h6Pc9boSS1LJ3sC9JrWV+2Jqgr3IB17tJ4ccEUi/V28koxXCm+cH59gEs/t+LOLerqSwoLkZ+H/tlivWqFyJRAtoHwWR8mcguOcpbGoqhdPmw66RbADS9Q7/CqfSly+riDD3ABBqXpOtdM22X3JqjSR1FOpi+ZjX/CapXCoc/qgWwu+gQErT8qgwnvdvqHUWcEyb4eHy2yblkyTYexgLajlP8d2M4/7XAGHda/ZuKqhb9QOn7ab7UNvh/EfmzJOSJU4InM2LRfv96Rjq5fdny4uf8iDObR7IdiLbN53VpW1HmyfyK2WjXpp7jM3z1mPgr1dG3UM8lrjy2AVmISCvb3GcB18SMH+fHg5r9jgguNZJHMegk4/Iiceh12HaEoFQtc14r7a6Qwc8+FaNb/r87OqeGARkU1Zk8hAiT4uGmO3xsRfyZ7pKSIoD0h+IBBt3Bj7oroQAkeMvXCgquQDNItA7isPK96VPdn22zDUoXUDUY=
+  secret_access_key: <%= ENV["AWS_SECRET"] %>
   bucket: helgacandys
   local-dir: build
   skip_cleanup: true
