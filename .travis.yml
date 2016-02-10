@@ -1,7 +1,7 @@
 language: ruby
 rvm: 2.1.1
 gemfile: Gemfile
-before_script: bundle
+before_script: gem install middleman-aws
 script: rake mm:build
 deploy:
   provider: s3
