@@ -10,6 +10,8 @@ deploy:
     application: helga_candys
     on:
       branch: master
+      repo: sichacvah/helga_candys.github.io
+      tags: true
     secret_access_key:
       secure: bVY6EJcE5uM/zYu9yFMKSttwbfPbYH3lB27YlmWK06rCb9R+wEuvigJMpAA8/ngdbv5Ytz601s73rg81D2XEjqzRWTVTNJK+5bxPDalgfI7AWXOFfv33YoaECFXXOBlP2Wq1sHQlU2uJfoGWBLzefVLf8WZtYEhwGnRZnRKCywxpvwYbDIIgw8kyUZXNZxCMq7LDXWpXys3eNeYlr6LGf6d9NOxvxWyzgTa+H2cVYMXT3QdZmtUn862l+LKHXIkrg2bMS9n0vYjuH/BySTFKTNzcRIC4SobaH85zlqpLM+H2h5HVKWsbRJDfVi/qyXppz6BeEDbFkI+VIFv2VMfJGjYcO3p7j4Mgf6HzN9U2JbWBTxFH4oqRQZyGDgvc/9j8QPkYSNAk1HADLSdiSmuMTJFyTRcD5UNt3Y87I28Jm+cUFFB5kF8/nnIxlwIB0QHL/qUgnmdyVE1QtZO2VffIsjzep9DMyRQIqcqZY57ypmFjRHRdVH4NisE/0G5JSqTwKbDmooQisXZmgAEH9zOZ1cE9wWv6UFRODEVXN845ts8ZZFouFo4r+ap5Yq2rGNrd3gBovdJR1DEwjCkrooC9sN3m7tZoFMvApYf9uolvRUw3yf3LCEwz8vofa4NE4EjdrMiECBU3czgAHaAY8WHFpLrGo+ZpLXQn7GgnZpEA28A=
     access_key_id:
