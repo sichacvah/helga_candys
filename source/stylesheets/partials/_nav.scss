@@ -1,5 +1,7 @@
 nav {	
 	&.post-nav {
+		margin: em(30) 0;
+		border-bottom: 1px solid $base-border-color;
 		height: em(50);
 		margin-top: em(8);
 		.post_nav_logo {
@@ -29,8 +31,9 @@ nav {
 			}
 		}	
 	}
-	border-bottom: 1px solid $base-border-color;
 	margin: em(30) 0;
+	margin-bottom: 0;
+	padding-bottom: em(30);
 	text-align: center;
 	
 

@@ -9,6 +9,8 @@ ol {
 	li {
 		margin: .5em 0;
 
+		
+
 		span {
 			display: inline-block;
 			&:before {
@@ -18,6 +20,19 @@ ol {
 		}
 	}
 }
+.post-link {
+	font-size: 2em;
+}
+
+.articles {
+	li.article {
+		border-top: 1px solid $base-border-color;
+		padding-bottom: em(30);
+		padding-top: em(30);
+	}
+}
+
+
 
 .large-column {
 	  @include span-columns(8 of 12);
