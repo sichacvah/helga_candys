@@ -58,6 +58,8 @@ activate :blog do |blog|
 end
 
 page "/feed.xml", layout: false
+page "posts/{category}/*", layout: "post_layout"
+page "contacts", layout: "post_layout"
 configure :development do
   activate :livereload
 end
