@@ -32,6 +32,6 @@ gem 'bourbon'
 
 gem 'middleman-aws'
 
-gem 'middleman-s3_sync'
+gem 'middleman-s3_sync', '3.0'
 gem 'middleman-cloudfront'
 
