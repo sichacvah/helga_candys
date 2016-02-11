@@ -1,5 +1,3 @@
-require "lib/categories.rb"
-helpers Categories
 
 ###
 # Page options, layouts, aliases and proxies
