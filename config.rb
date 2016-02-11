@@ -46,7 +46,7 @@ activate :blog do |blog|
   blog.calendar_template = "calendar.html"
 	blog.permalink = "categories/{category}/posts/{title}"
 	blog.default_extension = ".markdown"
-	blog.layout = "layout"
+	blog.layout = "post_layout"
 	blog.sources = "posts/{category}/{title}"
 	blog.summary_separator = /SPLIT_SUMMARY_BEFORE_THIS/
 	blog.custom_collections = {
@@ -58,8 +58,7 @@ activate :blog do |blog|
 end
 
 page "/feed.xml", layout: false
-page "posts/{category}/*", layout: "post_layout"
-page "contacts", layout: "post_layout"
+page "/contacts.html", layout: "post_layout"
 configure :development do
   activate :livereload
 end
