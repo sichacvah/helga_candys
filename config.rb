@@ -26,7 +26,7 @@ activate :s3_sync do |s3_sync|
 	s3_sync.aws_access_key_id =  AWS_ACCESS_KEY
 	s3_sync.aws_secret_access_key = AWS_SECRET
 	s3_sync.region = 'eu-central-1'
-	s3_sync.delete = false
+	s3_sync.delete = true
 end
 
 activate :cloudfront do |cf|
