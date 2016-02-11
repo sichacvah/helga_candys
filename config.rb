@@ -52,7 +52,7 @@ activate :blog do |blog|
 	blog.custom_collections = {
 		category: {
 			link: '/categories/{category}/posts.html',
-			template: '/category.html'
+			template: '/post.html'
 		}
 	}
 end
