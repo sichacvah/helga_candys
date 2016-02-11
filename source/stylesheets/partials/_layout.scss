@@ -8,9 +8,6 @@ ol {
 
 	li {
 		margin: .5em 0;
-
-		
-
 		span {
 			display: inline-block;
 			&:before {
@@ -21,14 +18,43 @@ ol {
 	}
 }
 .post-link {
-	font-size: 2em;
+	font-size: 1.4rem;
+}
+.meta {
+	.tags {
+		a {
+			font-size: 0.9rem;
+
+		}
+	}
+	.author {
+		font-family: "freight-text-pro", "Georgia", "Cambria", "Times New Roman", "Times", serif;
+		font-weight: 100;
+		color: $action-color;
+		&:after {
+			content: "–";
+			color: #737685;
+			display: inline;
+			margin: 0 0.5rem;
+		}
+	}
 }
 
 .articles {
 	li.article {
+		color: $medium-gray;
 		border-top: 1px solid $base-border-color;
 		padding-bottom: em(30);
 		padding-top: em(30);
+		.post-link {
+			a {
+				color: $base-font-color;
+				&:hover {
+					color: $action-color;
+				}
+			}
+			
+		}
 	}
 }
 

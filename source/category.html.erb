@@ -1,18 +1,44 @@
+---
+pageable: true
+per_page: 10
+---
+
 <% content_for :title do %>
   <%= category %>
 <% end %>
 
+<% if paginate && num_pages > 1 %>
+  <p>Страница <%= page_number %> of <%= num_pages %></p>
 
-<div class="category-header" id="<%= category %>">
-  <h2>
-    <%= category %>
-  </h2>
-</div>
-
-<ul class="category-posts">
-  <% articles.each do |article| %>
-    <li>
-      <%= link_to article.title, article.url %>
-    </li>
+  <% if prev_page %>
+    <p><%= link_to 'Назад', prev_page %></p>
   <% end %>
+<% end %>
+
+<ul class="articles">
+	<% page_articles.each_with_index do |article, i| %>
+		<li class="article">
+	  	<h3 class="post-link"><%= link_to article.title, article %></h3>
+			<p><%= article.summary %></p>
+			<p class="meta">
+				<em class="author">Ольга</em> 
+				<%= I18n.localize(article.date, format: "%B %d, %Y") %>
+				<span class="tags">
+					&nbsp;
+					<% article.tags.each_with_index do |tag, index| %>
+						<% if index == article.tags.length - 1 %>
+							<%= link_to tag.upcase, tag_path(tag) %>
+						<% else %>
+							<%= link_to "#{tag.upcase} ,", tag_path(tag) %>
+						<% end %>
+					<% end %>
+				</span>
+			</p>
+	  </li>
+	<% end %>
 </ul>
+<% if paginate %>
+  <% if next_page %>
+    <p><%= link_to 'Вперёд', next_page %></p>
+  <% end %>
+<% end %>
