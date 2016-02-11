@@ -34,7 +34,6 @@ activate :cloudfront do |cf|
 	cf.access_key_id                    = AWS_ACCESS_KEY
 	cf.secret_access_key                = AWS_SECRET
 	cf.distribution_id                  = AWS_CLOUDFRONT_DISTRIBUTION_ID
-
 end
 
 activate :deploy do |deploy|
@@ -65,4 +64,7 @@ configure :development do
 end
 
 configure :build do
+	activate :minify_css
+	activate :minify_javascript
+	activate :asset_hash
 end
