@@ -1,6 +1,7 @@
 ---
 title: Статья о макарунах
 date: 2012-01-01
+category: macaroons
 tags: macaroons
 ---
 

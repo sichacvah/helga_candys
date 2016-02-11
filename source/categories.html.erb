@@ -1,0 +1,10 @@
+<h1> Рецепты </h1>
+<div class="categories">
+  <ul>
+    <% blog.articles.each do |article| %>
+      <li>
+        <%= link_to article.data.category, category_path(article.data.category) %>
+      </li>
+    <% end %>
+  </ul>
+</div>

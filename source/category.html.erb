@@ -1,0 +1,18 @@
+<% content_for :title do %>
+  <%= category %>
+<% end %>
+
+
+<div class="category-header" id="<%= category %>">
+  <h2>
+    <%= category %>
+  </h2>
+</div>
+
+<ul class="category-posts">
+  <% articles.each do |article| %>
+    <li>
+      <%= link_to article.title, article.url %>
+    </li>
+  <% end %>
+</ul>

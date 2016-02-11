@@ -1,4 +1,5 @@
-
+require "lib/categories.rb"
+helpers Categories
 
 ###
 # Page options, layouts, aliases and proxies
@@ -14,11 +15,13 @@ page '/*.txt', layout: false
 # Helpers
 ###
 
+
 AWS_BUCKET = 'helgacandys'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
 AWS_SECRET      = ENV['AWS_SECRET']
+
 
 activate :s3_sync do |s3_sync|
 	s3_sync.bucket = AWS_BUCKET
@@ -48,12 +51,12 @@ activate :blog do |blog|
 	blog.layout = "layout"
 	blog.sources = "posts/{category}/{title}"
 	blog.summary_separator = /SPLIT_SUMMARY_BEFORE_THIS/
-#	blog.custom_collections = {
-#		category: {
-#			link: '/categories/{category}/posts.html',
-#			template: '/category.html'
-#		}
-#	}
+	blog.custom_collections = {
+		category: {
+			link: '/categories/{category}/posts.html',
+			template: '/category.html'
+		}
+	}
 end
 
 page "/feed.xml", layout: false

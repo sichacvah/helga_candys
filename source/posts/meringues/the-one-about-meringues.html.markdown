@@ -1,6 +1,7 @@
 ---
 title: Меренги
 date: 2016-02-09
+category: meringues
 tags: meringues
 ---
 
