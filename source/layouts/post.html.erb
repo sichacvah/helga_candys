@@ -1,23 +1,33 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<%= stylesheet_link_tag "all" %>
-		<link href='http://fonts.googleapis.com/css?family=Oxygen:400,300,700'
-		  rel='stylesheet' type='text/css'>
+	<%= partial "../partials/head" %>
 
-    <title>Blog Title<%= ' - ' + current_article.title unless current_article.nil? %></title>
-    <%= feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed" %>
-  </head>
+	<script src="https://carnivalapp.io/sites/495/init.js"></script>
   <body>
 
 	<%= partial "partials/post_nav" %>
 	<div id="main" role="main">
-		<%= yield %>
+		<% if current_article.nil? %>
+			<%= yield %>
+		<% else %>
+			<article><%= yield %></article>
+		<% end %>
 		<%= partial "partials/footer" %>
   </div>
 
-  </body>
+	</body>
+	<script>
+		document.addEventListener(
+				"DOMContentLoaded",
+				function () { 
+					Carnival.init({
+						enabled: true,
+						article_author: "Ольга",
+	    			article_selector: "article",
+						block_selector: ":scope > p, :scope > pre, :scope > blockquote, :scope > img, :scope > ul"			
+					});
+					
+				}
+		);
+	</script>
 </html>

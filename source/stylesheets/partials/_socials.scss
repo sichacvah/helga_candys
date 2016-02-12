@@ -1,0 +1,27 @@
+.social {
+	text-align: center;
+	float: left;
+	width: 100%;
+	margin-top: em(25);
+	margin-bottom: em(25);
+	
+	a{
+		width: em(50);
+		height: em(50);
+		display: inline-block;
+		background-size: 100%;
+		background-repeat: no-repeat;
+		background-position: center;
+		&.instagramm {
+			background-image: url('../images/instagramm.png')
+		}
+		&.vk {
+			background-image: url('../images/vk.png')
+		}
+		&.google {
+			background-image: url('../images/google.png')
+		}
+	}
+}
+
+

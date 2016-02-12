@@ -3,7 +3,7 @@
   <ul>
     <% blog.articles.each do |article| %>
       <li>
-        <%= link_to article.data.category, category_path(article.data.category) %>
+        <%= link_to I18n.t(article.data.category.to_sym), category_path(article.data.category) %>
       </li>
     <% end %>
   </ul>

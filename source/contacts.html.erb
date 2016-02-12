@@ -1,6 +1,25 @@
 <h1 class="post-title"> Контакты </h1>
 <div class="contacts">
-	<p> Вы всегда можете связаться со мной</p>
+	<p> Вы всегда можете связаться со мной в соц сетях:</p>
+
+	<div class="social">
+		<a href="https://www.instagram.com/_helga23_/" target="_blank" class="instagramm"></a>
+		<a href="http://vk.com/anikeeva1993" target="_blank" class="vk"></a>
+		<a href="https://plus.google.com/109227409112170348831" target="_blank" class="google"></a>		
+	</div>
+
+	<p> Или написать сообщение прямо здесь: </p>
+
+	<div class="contact-form">
+		<form action="https://helga-messages.herokuapp.com/tickets"  method="POST">
+			<fieldset>
+				<input aria-label="Ваш email адрес" name="email" placeholder="Ваш email адрес" required="true" type="email" />
+				<input aria-label="Ваше имя" name="name" placeholder="Ваше имя" required="true" type="text" />
+				<textarea name="message" rows="7" id="message" placeholder="Сообщение"></textarea>
+				<input type="submit" name="commit" value="Отправить" class="button reset-style" data-disable-with="Submitting">
+			</fieldset>
+		</form>
+	</div>
 </div>
 
 

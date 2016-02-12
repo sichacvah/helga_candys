@@ -1,4 +1,8 @@
 ru:
+  meringues: Меренги
+  cupcakes: Капкейки
+  macaroons: Макаруны
+  cakes: Торты
   date:
     formats:
       default: "%d-%m-%Y"
