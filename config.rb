@@ -14,7 +14,7 @@ page '/*.txt', layout: false
 ###
 activate :i18n, :langs => [:ru]
 
-AWS_BUCKET = 'helgacandys'
+AWS_BUCKET = 'helgacandys.ml'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
