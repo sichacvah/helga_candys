@@ -1,10 +1,9 @@
 <h1> Рецепты </h1>
 <div class="categories">
   <ul>
-    <% blog.articles.each do |article| %>
-      <li>
-        <%= link_to I18n.t(article.data.category.to_sym), category_path(article.data.category) %>
-      </li>
-    <% end %>
+    <li><%= link_to "Торты", category_path(:cakes) %></li>
+    <li><%= link_to "Капкейки", category_path(:cupcakes) %></li>
+    <li><%= link_to "Mеренги", category_path(:meringues) %></li>
+    <li><%= link_to "Макаруны", category_path(:macaroons) %></li>
   </ul>
 </div>

@@ -1,7 +1,6 @@
 ---
 title: Статья о тортиках
 date: 2012-01-01
-category: cakes
 tags: cakes
 ---
 

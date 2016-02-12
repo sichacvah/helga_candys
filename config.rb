@@ -12,20 +12,21 @@ page '/*.txt', layout: false
 ###
 # Helpers
 ###
-activate :i18n, :langs => [:ru]
+activate :directory_indexes
+activate :i18n, :mount_at_root => :ru, :no_fallbacks => true
 
-AWS_BUCKET = 'helgacandys.ml'
+AWS_BUCKET = 'helgacandys.co.vu'
 AWS_CLOUDFRONT_DISTRIBUTION_ID = 'E110EXKTVLVW59'
 
 AWS_ACCESS_KEY = ENV['AWS_ACCESS_KEY']
-AWS_SECRET      = ENV['AWS_SECRET']
+AWS_SECRET = ENV['AWS_SECRET']
 
 
 activate :s3_sync do |s3_sync|
 	s3_sync.bucket = AWS_BUCKET
 	s3_sync.aws_access_key_id =  AWS_ACCESS_KEY
 	s3_sync.aws_secret_access_key = AWS_SECRET
-	s3_sync.region = 'eu-central-1'
+	s3_sync.region = 's3-us-west-2'
 	s3_sync.delete = true
 end
 
