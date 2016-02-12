@@ -2,7 +2,7 @@
 title: Статья о капкейках
 date: 2012-01-05
 category: cupcakes
-tags: cupcakes
+tags: cupcakes, cakes, кексы
 ---
 
  header
