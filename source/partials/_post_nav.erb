@@ -5,12 +5,8 @@
 		<% end %>
 	</div>
 
-	<div class="post_navigation">
-		<ul >
-			<li><%= link_to "Главная", "/" %></li>
-			<li><%= link_to "Контакты", "/contacts.html" %></li>
-			<li><%= link_to "Рецепты", "/categories.html" %> </li>
-		</ul>
+  <div class="post_navigation">
+    <%= partial 'partials/nav_links' %>
 	</div>
 	
 
