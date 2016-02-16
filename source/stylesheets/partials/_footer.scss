@@ -2,14 +2,13 @@ footer {
 	border-top: 1px solid $base-border-color;
 	margin: 2em 0;
 	padding-top: 2em;
+	.outer-container {
+		padding: em(60) 0;
+	}
 }
 
 .copiright {
 	
-	position: absolute;
-	bottom:0;
-	right: 0;
-	left:0;
 	background-color: rgba(228,229,233,0.96);
 	padding: em(30) em(12);
 	text-align: center;
