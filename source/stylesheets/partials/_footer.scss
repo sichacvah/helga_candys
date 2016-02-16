@@ -3,3 +3,20 @@ footer {
 	margin: 2em 0;
 	padding-top: 2em;
 }
+
+.copiright {
+	
+	position: absolute;
+	bottom:0;
+	right: 0;
+	left:0;
+	background-color: rgba(228,229,233,0.96);
+	padding: em(30) em(12);
+	text-align: center;
+	strong {
+		display: block;
+	   text-transform: uppercase;
+	}
+	
+}
+
