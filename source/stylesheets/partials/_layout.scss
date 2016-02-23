@@ -1,3 +1,14 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+#product-cart {
+}
+
+body {
+  background-color: #f6f7f7;
+}
+
 #main {
 	@include outer-container;
 }
@@ -72,4 +83,12 @@ ol {
 .small-column {
 	  @include span-columns(4 of 12);
 
+}
+
+.six-column {
+  @include span-columns(6 of 12);
+}
+
+.three-column {
+  @include span-columns(3 of 12);
 }

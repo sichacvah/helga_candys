@@ -1,5 +1,8 @@
 <h1> Рецепты </h1>
 <div class="categories">
   <ul>
+    <% page_articles.map { |p| p.data.category }.uniq.each do |category| %>
+      <li><%= link_to category, category_path(category) %></li>
+    <% end %>
   </ul>
 </div>

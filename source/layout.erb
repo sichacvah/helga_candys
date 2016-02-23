@@ -2,11 +2,12 @@
 <html>
 	<%= partial "partials/head" %>
   <body>
+    <div id="product-cart"></div>
 
-	<div id="main" role="main">
-		<%= partial "partials/nav" %>
-		<%= yield %>
-  </div>
-  <%= partial "partials/footer" %>
+    <div id="main" role="main">
+      <%= partial "partials/nav" %>
+      <%= yield %>
+    </div>
+    <%= partial "partials/footer" %>
 	</body>
 </html>

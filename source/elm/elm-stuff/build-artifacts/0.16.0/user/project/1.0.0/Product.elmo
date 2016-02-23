@@ -1,0 +1,219 @@
+Elm.Product = Elm.Product || {};
+Elm.Product.make = function (_elm) {
+   "use strict";
+   _elm.Product = _elm.Product || {};
+   if (_elm.Product.values) return _elm.Product.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp = Elm.StartApp.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var showError = function (min) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-error",_1: true}]))]),
+      _U.list([$Html.text(A2($Basics._op["++"],
+      "Для оформления заказа нужно набрать минимальное количество товара - ",
+      A2($Basics._op["++"],$Basics.toString(min),"шт.")))]));
+   };
+   var isShowed = function (showed) {    return showed ? "block" : "none";};
+   _op["=>"] = F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};});
+   var changeCount = F3(function (id,count,variant) {    return _U.eq(variant.id,id) ? _U.update(variant,{count: count}) : variant;});
+   var RequestProduct = function (a) {    return {ctor: "RequestProduct",_0: a};};
+   var ChangeCount = F2(function (a,b) {    return {ctor: "ChangeCount",_0: a,_1: b};});
+   var AddToCart = {ctor: "AddToCart"};
+   var Hide = {ctor: "Hide"};
+   var Show = function (a) {    return {ctor: "Show",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var productView = F4(function (address,needShowError,min,variant) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-info",_1: true}]))]),
+      A2($Basics._op["++"],
+      needShowError && (_U.cmp(min,variant.count) > 0 && _U.cmp(variant.count,0) > 0) ? _U.list([showError(min)]) : _U.list([A2($Html.div,
+      _U.list([]),
+      _U.list([]))]),
+      _U.list([A2($Html.img,
+              _U.list([$Html$Attributes.src(variant.imageUrl),$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
+              _U.list([]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-name",_1: true},{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),
+              _U.list([$Html.text(A2($Basics._op["++"],variant.name,A2($Basics._op["++"],". ",variant.description)))
+                      ,A2($Html.div,
+                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-count",_1: true}]))]),
+                      _U.list([A2($Html.input,
+                      _U.list([$Html$Attributes.type$("number")
+                              ,$Html$Attributes.value($Basics.toString(variant.count))
+                              ,$Html$Attributes.name("product_count")
+                              ,$Html$Attributes.min("0")
+                              ,A3($Html$Events.on,
+                              "input",
+                              $Html$Events.targetValue,
+                              function (str) {
+                                 var _p0 = $String.toInt(str);
+                                 if (_p0.ctor === "Ok") {
+                                       return A2($Signal.message,address,A2(ChangeCount,variant.id,_p0._0));
+                                    } else {
+                                       return A2($Signal.message,address,NoOp);
+                                    }
+                              })]),
+                      _U.list([]))]))]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-price",_1: true},{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
+              _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price)," руб."))]))])));
+   });
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],"position","fixed")
+                                                      ,A2(_op["=>"],"display",isShowed(model.showed))
+                                                      ,A2(_op["=>"],"width","100%")
+                                                      ,A2(_op["=>"],"height","100%")]))
+                      ,A2($Html$Events.onClick,address,Hide)
+                      ,$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-overlay",_1: true}]))]),
+              _U.list([]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-container",_1: true}]))
+                      ,$Html$Attributes.style(_U.list([A2(_op["=>"],"display",isShowed(model.showed))
+                                                      ,A2(_op["=>"],"top",A2($Basics._op["++"],$Basics.toString(model.top + 30),"px"))]))]),
+              A2($Basics._op["++"],
+              _U.list([A2($Html.h1,_U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],"margin-top","1em")]))]),_U.list([$Html.text("Выберите вид :")]))]),
+              A2($Basics._op["++"],
+              A2($List.map,A3(productView,address,model.showError,model.min),model.variants),
+              _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,AddToCart)]),_U.list([$Html.text("В корзину")]))]))))]));
+   });
+   var addToCartMailbox = $Signal.mailbox(_U.list([]));
+   var toCart = function (variants) {
+      return $Effects.task(A2($Task.map,function (_p1) {    return Hide;},A2($Signal.send,addToCartMailbox.address,variants)));
+   };
+   var addToCart = Elm.Native.Port.make(_elm).outboundSignal("addToCart",
+   function (v) {
+      return Elm.Native.List.make(_elm).toArray(v).map(function (v) {
+         return {id: v.id,name: v.name,description: v.description,price: v.price,imageUrl: v.imageUrl,count: v.count};
+      });
+   },
+   addToCartMailbox.signal);
+   var ProductFromServer = F4(function (a,b,c,d) {    return {name: a,id: b,min: c,variants: d};});
+   var Product = F3(function (a,b,c) {    return {name: a,id: b,variants: c};});
+   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {left: a,top: b,productId: c,name: d,min: e,showError: f,variants: g,showed: h};});
+   var initModel = A8(Model,0,0,0,"",0,false,_U.list([]),false);
+   var init = {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
+   var VariantWithoutCount = F5(function (a,b,c,d,e) {    return {id: a,name: b,description: c,price: d,imageUrl: e};});
+   var productDecoder = A5($Json$Decode.object4,
+   ProductFromServer,
+   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"id",$Json$Decode.$int),
+   A2($Json$Decode._op[":="],"min",$Json$Decode.$int),
+   A2($Json$Decode._op[":="],
+   "variants",
+   $Json$Decode.list(A6($Json$Decode.object5,
+   VariantWithoutCount,
+   A2($Json$Decode._op[":="],"id",$Json$Decode.$int),
+   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"description",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"price",$Json$Decode.$float),
+   A2($Json$Decode._op[":="],"image_url",$Json$Decode.string)))));
+   var getProduct = function (id) {    return A2($Http.get,productDecoder,A2($Basics._op["++"],"http://0.0.0.0:3000/api/v1/products/",$Basics.toString(id)));};
+   var safeGetProduct = function (id) {    return $Task.toResult(getProduct(id));};
+   var productRequest = function (id) {    return $Effects.task(A2($Task.map,Show,safeGetProduct(id)));};
+   var Variant = F6(function (a,b,c,d,e,f) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f};});
+   var addCountToVariant = function (variantWithoutCount) {
+      return A6(Variant,
+      variantWithoutCount.id,
+      variantWithoutCount.name,
+      variantWithoutCount.description,
+      variantWithoutCount.price,
+      variantWithoutCount.imageUrl,
+      0);
+   };
+   var update = F2(function (action,model) {
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "Show": var _p3 = _p2._0;
+           if (_p3.ctor === "Ok") {
+                 var _p4 = _p3._0;
+                 return {ctor: "_Tuple2"
+                        ,_0: _U.update(model,{showed: true,name: _p4.name,min: _p4.min,variants: A2($List.map,addCountToVariant,_p4.variants)})
+                        ,_1: $Effects.none};
+              } else {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};
+              }
+         case "AddToCart": return A2($List.any,
+           function (count) {
+              return _U.cmp(count,model.min) < 0 && _U.cmp(count,0) > 0;
+           },
+           A2($List.map,function ($var) {    return $var.count;},model.variants)) ? {ctor: "_Tuple2"
+                                                                                    ,_0: _U.update(model,{showError: true})
+                                                                                    ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                          ,_0: model
+                                                                                                          ,_1: toCart(model.variants)};
+         case "RequestProduct": var _p5 = _p2._0;
+           return {ctor: "_Tuple2",_0: _U.update(model,{productId: _p5.productId,left: _p5.left,top: _p5.top,showed: false}),_1: productRequest(_p5.productId)};
+         case "ChangeCount": return {ctor: "_Tuple2"
+                                    ,_0: _U.update(model,{showError: false,variants: A2($List.map,A2(changeCount,_p2._0,_p2._1),model.variants)})
+                                    ,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};}
+   });
+   var InitParamsRecord = F3(function (a,b,c) {    return {left: a,top: b,productId: c};});
+   var initParams = Elm.Native.Port.make(_elm).inboundSignal("initParams",
+   "Maybe.Maybe\n    Product.InitParamsRecord",
+   function (v) {
+      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "object" && "left" in v && "top" in v && "productId" in v ? {_: {}
+                                                                                                                                                            ,left: typeof v.left === "number" ? v.left : _U.badPort("a number",
+                                                                                                                                                            v.left)
+                                                                                                                                                            ,top: typeof v.top === "number" ? v.top : _U.badPort("a number",
+                                                                                                                                                            v.top)
+                                                                                                                                                            ,productId: typeof v.productId === "number" && isFinite(v.productId) && Math.floor(v.productId) === v.productId ? v.productId : _U.badPort("an integer",
+                                                                                                                                                            v.productId)} : _U.badPort("an object with fields `left`, `top`, `productId`",
+      v));
+   });
+   var toAction = function (paramsRecord) {    var _p6 = paramsRecord;if (_p6.ctor === "Nothing") {    return NoOp;} else {    return RequestProduct(_p6._0);}};
+   var showProductInput = A2($Signal.map,toAction,initParams);
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([showProductInput])});
+   var main = app.html;
+   var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
+   return _elm.Product.values = {_op: _op
+                                ,app: app
+                                ,main: main
+                                ,toAction: toAction
+                                ,showProductInput: showProductInput
+                                ,InitParamsRecord: InitParamsRecord
+                                ,Variant: Variant
+                                ,VariantWithoutCount: VariantWithoutCount
+                                ,Model: Model
+                                ,Product: Product
+                                ,ProductFromServer: ProductFromServer
+                                ,initModel: initModel
+                                ,init: init
+                                ,addToCartMailbox: addToCartMailbox
+                                ,toCart: toCart
+                                ,NoOp: NoOp
+                                ,Show: Show
+                                ,Hide: Hide
+                                ,AddToCart: AddToCart
+                                ,ChangeCount: ChangeCount
+                                ,RequestProduct: RequestProduct
+                                ,getProduct: getProduct
+                                ,safeGetProduct: safeGetProduct
+                                ,productRequest: productRequest
+                                ,productDecoder: productDecoder
+                                ,addCountToVariant: addCountToVariant
+                                ,update: update
+                                ,changeCount: changeCount
+                                ,isShowed: isShowed
+                                ,productView: productView
+                                ,showError: showError
+                                ,view: view};
+};

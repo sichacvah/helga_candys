@@ -1,0 +1,30 @@
+<ul class="articles">
+	<% page_articles.each_with_index do |article, i| %>
+		<li class="article">
+	  	<h3 class="post-link"><%= link_to article.title, article %></h3>
+			<p><%= article.summary %></p>
+			<p class="meta">
+				<%= I18n.localize(article.date, format: "%B %d, %Y") %>
+				<span class="tags">
+					&nbsp;
+					<% article.tags.each_with_index do |tag, index| %>
+						<% if index == article.tags.length - 1 %>
+							<%= link_to tag.upcase, tag_path(tag) %>
+						<% else %>
+							<%= link_to "#{tag.upcase} ,", tag_path(tag) %>
+            <% end %>
+          <% end %>
+        </span>
+        <% if article.data.product_id %>
+          <span class="to-cart">
+            &nbsp;
+            <a href="#" class="product-to-cart" data-product-id="<%= article.data.product_id %>">
+              Заказать
+            </a>
+          </span>
+        <% end %>
+			</p>
+	  </li>
+	<% end %>
+</ul>
+
