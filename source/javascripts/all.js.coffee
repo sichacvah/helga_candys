@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", ->
                    document.getElementById('product-cart'), 
                    {initParams: null})
 
-  cart = Elm.embed(Elm.Cart, document.getElementById('cart'), {initParams: null})
+	cart = Elm.embed(Elm.Cart, document.getElementById('cart'), {initParams: null})
+	
 
 
 
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", ->
         productId: parseInt(productId)
       )
       product.ports.addToCart.subscribe( (items)->
-        cart.ports.addToCart(items)
+				cart.ports.addToCart(items)
       )
 )
 
