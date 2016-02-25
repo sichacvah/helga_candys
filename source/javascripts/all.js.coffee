@@ -1,15 +1,32 @@
 #= require product
+#= require cart
 
+parseCartItems = (cartItems) ->
+  if cartItems && cartItems.length > 0
+    JSON.parse(cartItems)
+  else
+    null
+
+
+stringifyCartItems = (items) ->
+  if items
+    JSON.stringify items
+  else
+    ""
 
 document.addEventListener("DOMContentLoaded", ->
   product = Elm.embed(Elm.Product, 
                    document.getElementById('product-cart'), 
                    {initParams: null})
 
-	cart = Elm.embed(Elm.Cart, document.getElementById('cart'), {initParams: null})
-	
+  cartItems = parseCartItems localStorage.getItem('cartItems')
 
-
+  cart = Elm.embed(Elm.Cart, document.getElementById('cart'), {addToCart: null})
+  if cartItems
+    cart.ports.addToCart.send(cartItems)
+  cart.ports.saveToStorage.subscribe( (items)->
+    localStorage.setItem('cartItems', stringifyCartItems(items))
+  )
 
   productsToCart = document.querySelectorAll ".product-to-cart"
   console.log productsToCart
@@ -26,7 +43,7 @@ document.addEventListener("DOMContentLoaded", ->
         productId: parseInt(productId)
       )
       product.ports.addToCart.subscribe( (items)->
-				cart.ports.addToCart(items)
+        cart.ports.addToCart.send(items)
       )
 )
 

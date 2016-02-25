@@ -17,6 +17,10 @@ body {
 	@include outer-container;
 }
 
+#cart {
+  @include outer-container;
+}
+
 ol {
 	font-size: 1em;
 	font-weight: 500;
@@ -80,6 +84,18 @@ ol {
 
 }
 
+.four-column {
+  @include span-columns(4 of 12);
+}
+
+.two-column {
+  @include span-columns(2 of 12);
+}
+
+.eight-column {
+  @include span-columns(8 of 12);
+}
+
 .small-column {
 	  @include span-columns(4 of 12);
 
@@ -87,6 +103,10 @@ ol {
 
 .six-column {
   @include span-columns(6 of 12);
+}
+
+.one-column {
+  @include span-columns(1 of 12);
 }
 
 .three-column {

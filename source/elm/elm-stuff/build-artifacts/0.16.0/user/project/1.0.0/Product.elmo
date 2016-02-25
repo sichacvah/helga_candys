@@ -100,7 +100,7 @@ Elm.Product.make = function (_elm) {
    var addToCart = Elm.Native.Port.make(_elm).outboundSignal("addToCart",
    function (v) {
       return Elm.Native.List.make(_elm).toArray(v).map(function (v) {
-         return {id: v.id,name: v.name,description: v.description,price: v.price,imageUrl: v.imageUrl,count: v.count};
+         return {id: v.id,name: v.name,description: v.description,price: v.price,imageUrl: v.imageUrl,count: v.count,min: v.min};
       });
    },
    addToCartMailbox.signal);
@@ -127,16 +127,17 @@ Elm.Product.make = function (_elm) {
    var getProduct = function (id) {    return A2($Http.get,productDecoder,A2($Basics._op["++"],"http://0.0.0.0:3000/api/v1/products/",$Basics.toString(id)));};
    var safeGetProduct = function (id) {    return $Task.toResult(getProduct(id));};
    var productRequest = function (id) {    return $Effects.task(A2($Task.map,Show,safeGetProduct(id)));};
-   var Variant = F6(function (a,b,c,d,e,f) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f};});
-   var addCountToVariant = function (variantWithoutCount) {
-      return A6(Variant,
+   var Variant = F7(function (a,b,c,d,e,f,g) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f,min: g};});
+   var addCountToVariant = F2(function (min,variantWithoutCount) {
+      return A7(Variant,
       variantWithoutCount.id,
       variantWithoutCount.name,
       variantWithoutCount.description,
       variantWithoutCount.price,
       variantWithoutCount.imageUrl,
-      0);
-   };
+      0,
+      min);
+   });
    var update = F2(function (action,model) {
       var _p2 = action;
       switch (_p2.ctor)
@@ -145,7 +146,7 @@ Elm.Product.make = function (_elm) {
            if (_p3.ctor === "Ok") {
                  var _p4 = _p3._0;
                  return {ctor: "_Tuple2"
-                        ,_0: _U.update(model,{showed: true,name: _p4.name,min: _p4.min,variants: A2($List.map,addCountToVariant,_p4.variants)})
+                        ,_0: _U.update(model,{showed: true,name: _p4.name,min: _p4.min,variants: A2($List.map,addCountToVariant(_p4.min),_p4.variants)})
                         ,_1: $Effects.none};
               } else {
                  return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};
@@ -158,7 +159,11 @@ Elm.Product.make = function (_elm) {
                                                                                     ,_0: _U.update(model,{showError: true})
                                                                                     ,_1: $Effects.none} : {ctor: "_Tuple2"
                                                                                                           ,_0: model
-                                                                                                          ,_1: toCart(model.variants)};
+                                                                                                          ,_1: toCart(A2($List.filter,
+                                                                                                          function (variant) {
+                                                                                                             return _U.cmp(variant.count,0) > 0;
+                                                                                                          },
+                                                                                                          model.variants))};
          case "RequestProduct": var _p5 = _p2._0;
            return {ctor: "_Tuple2",_0: _U.update(model,{productId: _p5.productId,left: _p5.left,top: _p5.top,showed: false}),_1: productRequest(_p5.productId)};
          case "ChangeCount": return {ctor: "_Tuple2"

@@ -10,8 +10,6 @@ Elm.Cart.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -20,177 +18,203 @@ Elm.Cart.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var showError = A2($Html.div,
-   _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-error",_1: true}]))]),
-   _U.list([$Html.text("Для оформления заказа нужно набрать минимальное количество товара")]));
-   var isShowed = function (showed) {    return showed ? "block" : "none";};
-   _op["=>"] = F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};});
-   var changeCount = F3(function (id,count,variant) {    return _U.eq(variant.id,id) ? _U.update(variant,{count: count}) : variant;});
-   var RequestProduct = function (a) {    return {ctor: "RequestProduct",_0: a};};
+   var showCheckOut = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([]));});
+   var cartHead = A2($Html.div,
+   _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-header",_1: true}]))]),
+   _U.list([A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),_U.list([$Html.text("Товар")]))
+           ,A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),_U.list([$Html.text("Количество")]))
+           ,A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "two-column",_1: true}]))]),_U.list([$Html.text("Цена")]))
+           ,A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "one-column",_1: true}]))]),_U.list([]))]));
+   var deleteFromCart = F2(function (variantId,variants) {    return A2($List.filter,function (item) {    return !_U.eq(item.id,variantId);},variants);});
+   var notInNew = function (_p0) {    var _p1 = _p0;return _p1._1;};
+   var variantsIds = function (variants) {    return A2($List.map,function (_) {    return _.id;},variants);};
+   var inNew = F2(function (newVariants,variant) {    return A2($List.member,variant.id,variantsIds(newVariants));});
+   var addVariants = F2(function (variants,newVariants) {
+      return A2($Basics._op["++"],newVariants,notInNew(A2($List.partition,inNew(newVariants),variants)));
+   });
+   var changeCount = F3(function (variantId,count,variant) {    return _U.eq(variant.id,variantId) ? _U.update(variant,{count: count}) : variant;});
+   var CheckoutView = {ctor: "CheckoutView"};
+   var CartView = {ctor: "CartView"};
    var ChangeCount = F2(function (a,b) {    return {ctor: "ChangeCount",_0: a,_1: b};});
-   var Hide = {ctor: "Hide"};
-   var Show = function (a) {    return {ctor: "Show",_0: a};};
+   var DeleteFromCart = function (a) {    return {ctor: "DeleteFromCart",_0: a};};
+   var Checkout = {ctor: "Checkout"};
+   var Toggle = {ctor: "Toggle"};
+   var AddToCart = function (a) {    return {ctor: "AddToCart",_0: a};};
    var NoOp = {ctor: "NoOp"};
-   var productView = F4(function (address,needShowError,min,variant) {
+   var itemView = F2(function (address,variant) {
       return A2($Html.div,
-      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-info",_1: true}]))]),
-      A2($Basics._op["++"],
-      needShowError && _U.cmp(min,variant.count) < 0 ? _U.list([showError]) : _U.list([A2($Html.div,_U.list([]),_U.list([]))]),
-      _U.list([A2($Html.img,
-              _U.list([$Html$Attributes.src(variant.imageUrl),$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
-              _U.list([]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-name",_1: true},{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),
-              _U.list([$Html.text(A2($Basics._op["++"],variant.name,A2($Basics._op["++"],". ",variant.description)))
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-product",_1: true}]))]),
+      _U.list([A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),
+              _U.list([A2($Html.img,
+                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "four-column",_1: true}])),$Html$Attributes.src(variant.imageUrl)]),
+                      _U.list([]))
                       ,A2($Html.div,
-                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-count",_1: true}]))]),
-                      _U.list([A2($Html.input,
-                      _U.list([$Html$Attributes.type$("number")
-                              ,$Html$Attributes.value($Basics.toString(variant.count))
-                              ,$Html$Attributes.name("product_count")
-                              ,$Html$Attributes.min("0")
-                              ,A3($Html$Events.on,
-                              "input",
-                              $Html$Events.targetValue,
-                              function (str) {
-                                 var _p0 = $String.toInt(str);
-                                 if (_p0.ctor === "Ok") {
-                                       return A2($Signal.message,address,A2(ChangeCount,variant.id,_p0._0));
-                                    } else {
-                                       return A2($Signal.message,address,NoOp);
-                                    }
-                              })]),
-                      _U.list([]))]))]))
+                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "eight-column",_1: true}]))]),
+                      _U.list([$Html.text(A2($Basics._op["++"],variant.name,A2($Basics._op["++"],". ",variant.description)))]))]))
               ,A2($Html.div,
-              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-price",_1: true},{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
-              _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price)," руб."))]))])));
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
+              _U.list([A2($Html.input,
+              _U.list([$Html$Attributes.type$("number")
+                      ,$Html$Attributes.value($Basics.toString(variant.count))
+                      ,$Html$Attributes.name(A2($Basics._op["++"],"product[",A2($Basics._op["++"],$Basics.toString(variant.id),"]")))
+                      ,$Html$Attributes.min($Basics.toString(variant.min))
+                      ,A3($Html$Events.on,
+                      "input",
+                      $Html$Events.targetValue,
+                      function (str) {
+                         var _p2 = $String.toInt(str);
+                         if (_p2.ctor === "Ok") {
+                               return A2($Signal.message,address,A2(ChangeCount,variant.id,_p2._0));
+                            } else {
+                               return A2($Signal.message,address,NoOp);
+                            }
+                      })]),
+              _U.list([]))]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "two-column",_1: true}]))
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "5px"}]))]),
+              _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price),"руб."))]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "one-column",_1: true}]))]),
+              _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,DeleteFromCart(variant.id))]),_U.list([$Html.text("×")]))]))]));
+   });
+   var showCart = F2(function (address,model) {
+      return model.isShowed ? A2($Html.div,
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-items",_1: true}]))]),
+      A2($Basics._op["++"],
+      _U.list([cartHead]),
+      A2($Basics._op["++"],
+      A2($List.map,itemView(address),model.variants),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "20px"}]))]),
+      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Checkout)]),_U.list([$Html.text("Оплатить")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "float",_1: "right"}]))]),
+              _U.list([$Html.text(A2($Basics._op["++"],
+              "Итого: ",
+              A2($Basics._op["++"],
+              $Basics.toString($List.sum(A2($List.map,function (item) {    return $Basics.toFloat(item.count) * item.price;},model.variants))),
+              "руб.")))]))]))])))) : A2($Html.div,_U.list([]),_U.list([]));
+   });
+   var getView = F2(function (address,model) {
+      var _p3 = model.viewType;
+      if (_p3.ctor === "CartView") {
+            return A2(showCart,address,model);
+         } else {
+            return A2(showCheckOut,address,model);
+         }
    });
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
       _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],"position","fixed")
-                                                      ,A2(_op["=>"],"display",isShowed(model.showed))
-                                                      ,A2(_op["=>"],"width","100%")
-                                                      ,A2(_op["=>"],"height","100%")]))
-                      ,A2($Html$Events.onClick,address,Hide)
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "position",_1: "fixed"}
+                                                      ,{ctor: "_Tuple2",_0: "display",_1: model.isShowed ? "block" : "none"}
+                                                      ,{ctor: "_Tuple2",_0: "left",_1: "0"}
+                                                      ,{ctor: "_Tuple2",_0: "background",_1: "transparent"}
+                                                      ,{ctor: "_Tuple2",_0: "bottom",_1: "0"}
+                                                      ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
+                                                      ,{ctor: "_Tuple2",_0: "height",_1: "100%"}]))
+                      ,A2($Html$Events.onClick,address,Toggle)
                       ,$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-overlay",_1: true}]))]),
               _U.list([]))
               ,A2($Html.div,
-              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-container",_1: true}]))
-                      ,$Html$Attributes.style(_U.list([A2(_op["=>"],"display",isShowed(model.showed))
-                                                      ,A2(_op["=>"],"top",A2($Basics._op["++"],$Basics.toString(model.top + 30),"px"))]))]),
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-container",_1: true}]))
+                      ,$Html$Attributes.style(_U.list([$List.isEmpty(model.variants) ? {ctor: "_Tuple2",_0: "display",_1: "none"} : {ctor: "_Tuple2"
+                                                                                                                                    ,_0: "display"
+                                                                                                                                    ,_1: "block"}]))]),
               A2($Basics._op["++"],
-              _U.list([A2($Html.h1,_U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],"margin-top","1em")]))]),_U.list([$Html.text("Выберите вид :")]))]),
-              A2($Basics._op["++"],
-              A2($List.map,A3(productView,address,model.showError,model.min),model.variants),
-              _U.list([A2($Html.button,_U.list([]),_U.list([$Html.text("В корзину")]))]))))]));
+              _U.list([A2($Html.div,
+              _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-button",_1: true}])),A2($Html$Events.onClick,address,Toggle)]),
+              _U.list([]))]),
+              _U.list([A2(getView,address,model)])))]));
    });
-   var needScrollTopMailbox = $Signal.mailbox(false);
-   var scrollTop = function (need) {
-      return $Effects.task(A2($Task.map,function (_p1) {    return NoOp;},A2($Signal.send,needScrollTopMailbox.address,need)));
-   };
-   var needScrollTop = Elm.Native.Port.make(_elm).outboundSignal("needScrollTop",function (v) {    return v;},needScrollTopMailbox.signal);
-   var ProductFromServer = F4(function (a,b,c,d) {    return {name: a,id: b,min: c,variants: d};});
-   var Product = F3(function (a,b,c) {    return {name: a,id: b,variants: c};});
-   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {left: a,top: b,productId: c,name: d,min: e,showError: f,variants: g,showed: h};});
-   var initModel = A8(Model,0,0,0,"",0,false,_U.list([]),false);
+   var Model = F5(function (a,b,c,d,e) {    return {clientEmail: a,clientName: b,variants: c,isShowed: d,viewType: e};});
+   var initModel = A5(Model,"","",_U.list([]),false,CartView);
    var init = {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
-   var VariantWithoutCount = F5(function (a,b,c,d,e) {    return {id: a,name: b,description: c,price: d,imageUrl: e};});
-   var productDecoder = A5($Json$Decode.object4,
-   ProductFromServer,
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"id",$Json$Decode.$int),
-   A2($Json$Decode._op[":="],"min",$Json$Decode.$int),
-   A2($Json$Decode._op[":="],
-   "variants",
-   $Json$Decode.list(A6($Json$Decode.object5,
-   VariantWithoutCount,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.$int),
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"description",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"price",$Json$Decode.$float),
-   A2($Json$Decode._op[":="],"image_url",$Json$Decode.string)))));
-   var getProduct = function (id) {    return A2($Http.get,productDecoder,A2($Basics._op["++"],"http://0.0.0.0:3000/api/v1/products/",$Basics.toString(id)));};
-   var safeGetProduct = function (id) {    return $Task.toResult(getProduct(id));};
-   var productRequest = function (id) {    return $Effects.task(A2($Task.map,Show,safeGetProduct(id)));};
-   var Variant = F6(function (a,b,c,d,e,f) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f};});
-   var addCountToVariant = function (variantWithoutCount) {
-      return A6(Variant,
-      variantWithoutCount.id,
-      variantWithoutCount.name,
-      variantWithoutCount.description,
-      variantWithoutCount.price,
-      variantWithoutCount.imageUrl,
-      0);
+   var Variant = F7(function (a,b,c,d,e,f,g) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f,min: g};});
+   var saveToStorageMailbox = $Signal.mailbox(_U.list([]));
+   var toStorage = function (variants) {
+      return $Effects.task(A2($Task.map,function (_p4) {    return NoOp;},A2($Signal.send,saveToStorageMailbox.address,variants)));
    };
    var update = F2(function (action,model) {
-      var _p2 = action;
-      switch (_p2.ctor)
+      var _p5 = action;
+      switch (_p5.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "Show": var _p3 = _p2._0;
-           if (_p3.ctor === "Ok") {
-                 var _p4 = _p3._0;
-                 return {ctor: "_Tuple2"
-                        ,_0: _U.update(model,{showed: true,name: _p4.name,min: _p4.min,variants: A2($List.map,addCountToVariant,_p4.variants)})
-                        ,_1: scrollTop(true)};
-              } else {
-                 return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};
-              }
-         case "RequestProduct": var _p5 = _p2._0;
-           return {ctor: "_Tuple2",_0: _U.update(model,{productId: _p5.productId,left: _p5.left,top: _p5.top,showed: false}),_1: productRequest(_p5.productId)};
-         case "ChangeCount": return {ctor: "_Tuple2"
-                                    ,_0: _U.update(model,{variants: A2($List.map,A2(changeCount,_p2._0,_p2._1),model.variants)})
-                                    ,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};}
+         case "AddToCart": var variants = A2(addVariants,model.variants,_p5._0);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
+         case "Checkout": return {ctor: "_Tuple2",_0: _U.update(model,{viewType: CheckoutView}),_1: $Effects.none};
+         case "DeleteFromCart": var variants = A2(deleteFromCart,_p5._0,model.variants);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
+         case "ChangeCount": var variants = A2($List.map,A2(changeCount,_p5._0,_p5._1),model.variants);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{isShowed: $Basics.not(model.isShowed)}),_1: $Effects.none};}
    });
-   var InitParamsRecord = F3(function (a,b,c) {    return {left: a,top: b,productId: c};});
-   var initParams = Elm.Native.Port.make(_elm).inboundSignal("initParams",
-   "Maybe.Maybe\n    Cart.InitParamsRecord",
+   var saveToStorage = Elm.Native.Port.make(_elm).outboundSignal("saveToStorage",
    function (v) {
-      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "object" && "left" in v && "top" in v && "productId" in v ? {_: {}
-                                                                                                                                                            ,left: typeof v.left === "number" ? v.left : _U.badPort("a number",
-                                                                                                                                                            v.left)
-                                                                                                                                                            ,top: typeof v.top === "number" ? v.top : _U.badPort("a number",
-                                                                                                                                                            v.top)
-                                                                                                                                                            ,productId: typeof v.productId === "number" && isFinite(v.productId) && Math.floor(v.productId) === v.productId ? v.productId : _U.badPort("an integer",
-                                                                                                                                                            v.productId)} : _U.badPort("an object with fields `left`, `top`, `productId`",
-      v));
+      return Elm.Native.List.make(_elm).toArray(v).map(function (v) {
+         return {id: v.id,name: v.name,description: v.description,price: v.price,imageUrl: v.imageUrl,count: v.count,min: v.min};
+      });
+   },
+   saveToStorageMailbox.signal);
+   var addToCart = Elm.Native.Port.make(_elm).inboundSignal("addToCart",
+   "Maybe.Maybe (List Cart.Variant)",
+   function (v) {
+      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "object" && v instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.map(function (v) {
+         return typeof v === "object" && "id" in v && "name" in v && "description" in v && "price" in v && "imageUrl" in v && "count" in v && "min" in v ? {_: {}
+                                                                                                                                                           ,id: typeof v.id === "number" && isFinite(v.id) && Math.floor(v.id) === v.id ? v.id : _U.badPort("an integer",
+                                                                                                                                                           v.id)
+                                                                                                                                                           ,name: typeof v.name === "string" || typeof v.name === "object" && v.name instanceof String ? v.name : _U.badPort("a string",
+                                                                                                                                                           v.name)
+                                                                                                                                                           ,description: typeof v.description === "string" || typeof v.description === "object" && v.description instanceof String ? v.description : _U.badPort("a string",
+                                                                                                                                                           v.description)
+                                                                                                                                                           ,price: typeof v.price === "number" ? v.price : _U.badPort("a number",
+                                                                                                                                                           v.price)
+                                                                                                                                                           ,imageUrl: typeof v.imageUrl === "string" || typeof v.imageUrl === "object" && v.imageUrl instanceof String ? v.imageUrl : _U.badPort("a string",
+                                                                                                                                                           v.imageUrl)
+                                                                                                                                                           ,count: typeof v.count === "number" && isFinite(v.count) && Math.floor(v.count) === v.count ? v.count : _U.badPort("an integer",
+                                                                                                                                                           v.count)
+                                                                                                                                                           ,min: typeof v.min === "number" && isFinite(v.min) && Math.floor(v.min) === v.min ? v.min : _U.badPort("an integer",
+                                                                                                                                                           v.min)} : _U.badPort("an object with fields `id`, `name`, `description`, `price`, `imageUrl`, `count`, `min`",
+         v);
+      })) : _U.badPort("an array",v));
    });
-   var toAction = function (paramsRecord) {    var _p6 = paramsRecord;if (_p6.ctor === "Nothing") {    return NoOp;} else {    return RequestProduct(_p6._0);}};
-   var showProductInput = A2($Signal.map,toAction,initParams);
-   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([showProductInput])});
+   var toAction = function (item) {    var _p6 = item;if (_p6.ctor === "Nothing") {    return NoOp;} else {    return AddToCart(_p6._0);}};
+   var toCartInput = A2($Signal.map,toAction,addToCart);
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([toCartInput])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    return _elm.Cart.values = {_op: _op
                              ,app: app
                              ,main: main
                              ,toAction: toAction
-                             ,showProductInput: showProductInput
-                             ,InitParamsRecord: InitParamsRecord
+                             ,toCartInput: toCartInput
+                             ,saveToStorageMailbox: saveToStorageMailbox
+                             ,toStorage: toStorage
                              ,Variant: Variant
-                             ,VariantWithoutCount: VariantWithoutCount
                              ,Model: Model
-                             ,Product: Product
-                             ,ProductFromServer: ProductFromServer
                              ,initModel: initModel
                              ,init: init
-                             ,needScrollTopMailbox: needScrollTopMailbox
-                             ,scrollTop: scrollTop
                              ,NoOp: NoOp
-                             ,Show: Show
-                             ,Hide: Hide
+                             ,AddToCart: AddToCart
+                             ,Toggle: Toggle
+                             ,Checkout: Checkout
+                             ,DeleteFromCart: DeleteFromCart
                              ,ChangeCount: ChangeCount
-                             ,RequestProduct: RequestProduct
-                             ,getProduct: getProduct
-                             ,safeGetProduct: safeGetProduct
-                             ,productRequest: productRequest
-                             ,productDecoder: productDecoder
-                             ,addCountToVariant: addCountToVariant
+                             ,CartView: CartView
+                             ,CheckoutView: CheckoutView
                              ,update: update
                              ,changeCount: changeCount
-                             ,isShowed: isShowed
-                             ,productView: productView
-                             ,showError: showError
-                             ,view: view};
+                             ,inNew: inNew
+                             ,variantsIds: variantsIds
+                             ,addVariants: addVariants
+                             ,notInNew: notInNew
+                             ,deleteFromCart: deleteFromCart
+                             ,cartHead: cartHead
+                             ,itemView: itemView
+                             ,view: view
+                             ,showCart: showCart
+                             ,getView: getView
+                             ,showCheckOut: showCheckOut};
 };

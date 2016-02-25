@@ -65,6 +65,7 @@ type alias Variant =
     , price : Float
     , imageUrl : String
     , count : Int
+    , min : Int
     }
 
 
@@ -182,8 +183,8 @@ productDecoder =
         )
 
 
-addCountToVariant : VariantWithoutCount -> Variant
-addCountToVariant variantWithoutCount =
+addCountToVariant : Int -> VariantWithoutCount -> Variant
+addCountToVariant min variantWithoutCount =
     Variant
         variantWithoutCount.id
         variantWithoutCount.name
@@ -191,6 +192,7 @@ addCountToVariant variantWithoutCount =
         variantWithoutCount.price
         variantWithoutCount.imageUrl
         0
+        min
 
 
 update : Action -> Model -> ( Model, Effects.Effects Action )
@@ -206,7 +208,7 @@ update action model =
                         | showed = True
                         , name = product.name
                         , min = product.min
-                        , variants = (List.map addCountToVariant product.variants)
+                        , variants = (List.map (addCountToVariant product.min) product.variants)
                       }
                     , Effects.none
                     )

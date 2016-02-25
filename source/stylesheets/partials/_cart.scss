@@ -48,3 +48,50 @@
   margin-top: 1em;
   margin-bottom: 1em;
 }
+
+#cart {
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(41, 63, 84, 0.24), 0 2px 6px rgba(41, 63, 84, 0.12);
+
+  .cart-items {
+    z-index: 50001;
+    background-color: white;
+
+    @include media($large-screen) {
+     width: 30%;
+      left: 35%;
+    }
+    width: 100%;
+    left:0;
+
+    padding: 2em;
+    position: absolute;
+    box-shadow: 0 2px 4px rgba(41, 63, 84, 0.24), 0 2px 6px rgba(41, 63, 84, 0.12);
+  }
+  .cart-header {
+    font-weight: bold;
+    font-size: 1rem;
+    height: 30px;
+    border-bottom: $base-border;
+  }
+  .cart-product {
+    height: 100px;
+    padding: 20px 0;
+    border-bottom: $base-border;
+    button {
+      padding: 0;
+      margin: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  }
+  .cart-button {
+    width: 30px;
+    height: 30px;
+    background-image: url('../images/paper-bag.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
