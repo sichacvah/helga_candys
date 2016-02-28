@@ -59,6 +59,16 @@ port sendToStripe =
     sendToStripeMailbox.signal
 
 
+port orderCreated : Signal Bool
+port orderCreated =
+    orderCreatedMailbox.signal
+
+
+orderCreatedMailbox : Signal.Mailbox Bool
+orderCreatedMailbox =
+    Signal.mailbox False
+
+
 type alias CardResponse =
     { error : Maybe String
     , cardToken : String
@@ -98,6 +108,13 @@ saveToStorageMailbox =
 toStorage : List Variant -> Effects Action
 toStorage variants =
     Signal.send saveToStorageMailbox.address variants
+        |> Task.map (\_ -> NoOp)
+        |> Effects.task
+
+
+toOrderCreated : Bool -> Effects Action
+toOrderCreated isCreated =
+    Signal.send orderCreatedMailbox.address isCreated
         |> Task.map (\_ -> NoOp)
         |> Effects.task
 
@@ -280,7 +297,7 @@ update action model =
             RecievePaymentResponse response ->
                 case response of
                     Ok str ->
-                        ( initModel, Effects.none )
+                        ( initModel, toOrderCreated True )
 
                     _ ->
                         ( { model | error = "Неверный email или неуказано имя" }, Effects.none )

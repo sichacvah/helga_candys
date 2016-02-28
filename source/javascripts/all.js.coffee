@@ -30,8 +30,11 @@ document.addEventListener("DOMContentLoaded", ->
    localStorage.setItem('cartItems', stringifyCartItems(items))
   )
 
+  cart.ports.orderCreated.subscribe( (created) ->
+    delete localStorage.cartItems
+  )
+
   cart.ports.sendToStripe.subscribe( (card)->
-    console.log card
 
     stripeCard = 
       number: card.cardNumber
@@ -40,36 +43,35 @@ document.addEventListener("DOMContentLoaded", ->
       exp_month: card.expMonth
     Stripe.card.createToken(stripeCard, (status, response) ->
       if (response.error) 
-        console.log  response.error
         cart.ports.recieveFromStripe.send({cardToken: "", error: response.error.code})
       else 
-        console.log response
         cart.ports.recieveFromStripe.send({cardToken: response.id, error: null})
     )
   )
 
   productsToCart = document.querySelectorAll ".product-to-cart"
 
-  for productToCart in productsToCart
-    productToCart.addEventListener "click", (e)->
-      delete product if product
-      product = Elm.embed(Elm.Product, 
-                   document.getElementById('product-cart'), 
-                   {initParams: null})
+  if productsToCart.length > 0
+    for productToCart in productsToCart
+      productToCart.addEventListener "click", (e)->
+        delete product if product
+        product = Elm.embed(Elm.Product, 
+                     document.getElementById('product-cart'), 
+                     {initParams: null})
 
-      e.preventDefault()
-      productId = this.dataset.productId
-      left = 0
-      top =  window.pageYOffset
-      product.ports.initParams.send(
-        top: top,
-        left: left,
-        productId: parseInt(productId)
-      )
-      product.ports.addToCart.subscribe( (items)->
-        console.log(items)
-        cart.ports.addToCart.send(items)
-      )
+        e.preventDefault()
+        productId = this.dataset.productId
+        left = 0
+        top =  window.pageYOffset
+        product.ports.initParams.send(
+          top: top,
+          left: left,
+          productId: parseInt(productId)
+        )
+        product.ports.addToCart.subscribe( (items)->
+          console.log(items)
+          cart.ports.addToCart.send(items)
+        )
 )
 
 

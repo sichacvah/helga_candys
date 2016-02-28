@@ -11461,80 +11461,6 @@ Elm.Cart.make = function (_elm) {
    var toStripe = function (card) {
       return $Effects.task(A2($Task.map,function (_p6) {    return NoOp;},A2($Signal.send,sendToStripeMailbox.address,card)));
    };
-   var update = F2(function (action,model) {
-      var card = model.card;
-      var _p7 = action;
-      switch (_p7.ctor)
-      {case "CardNumber": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cardNumber: _p7._0})}),_1: $Effects.none};
-         case "CardVerification": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cvc: _p7._0})}),_1: $Effects.none};
-         case "CardExpire": var changeCard = F2(function (m,y) {    return _U.update(card,{expMonth: m,expYear: y});});
-           var getYear = function (arr) {    return A2($Maybe.withDefault,"",$List.head(arr));};
-           var expArr = A2($String.split,"/",A2($Debug.log,"EXP => ",_p7._0));
-           var _p8 = expArr;
-           if (_p8.ctor === "::") {
-                 if (_p8._1.ctor === "[]") {
-                       var _p9 = _p8._0;
-                       return _U.eq($String.length(card.expYear),0) && !_U.eq($String.length(card.expMonth),1) ? {ctor: "_Tuple2"
-                                                                                                                 ,_0: _U.update(model,
-                                                                                                                 {card: A2(changeCard,
-                                                                                                                 A2($String.left,1,_p9),
-                                                                                                                 "")})
-                                                                                                                 ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                                                                                       ,_0: _U.update(model,
-                                                                                                                                       {card: A2(changeCard,
-                                                                                                                                       _p9,
-                                                                                                                                       "")})
-                                                                                                                                       ,_1: $Effects.none};
-                    } else {
-                       var _p11 = _p8._1;
-                       var _p10 = _p8._0;
-                       return _U.cmp($String.length(card.expYear),0) > 0 && _U.eq($String.length(getYear(_p11)),0) ? {ctor: "_Tuple2"
-                                                                                                                     ,_0: _U.update(model,
-                                                                                                                     {card: A2(changeCard,
-                                                                                                                     A2($String.left,1,_p10),
-                                                                                                                     "")})
-                                                                                                                     ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                                                                                           ,_0: _U.update(model,
-                                                                                                                                           {card: A2(changeCard,
-                                                                                                                                           _p10,
-                                                                                                                                           getYear(_p11))})
-                                                                                                                                           ,_1: $Effects.none};
-                    }
-              } else {
-                 return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-              }
-         case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "AddToCart": var variants = A2(addVariants,model.variants,_p7._0);
-           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
-         case "ShowCheckout": return A2($List.any,function (variant) {    return _U.cmp(variant.count,variant.min) < 0;},model.variants) ? {ctor: "_Tuple2"
-                                                                                                                                           ,_0: _U.update(model,
-                                                                                                                                           {showError: true})
-                                                                                                                                           ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                                                                                                                 ,_0: _U.update(model,
-                                                                                                                                                                 {viewType: CheckoutView})
-                                                                                                                                                                 ,_1: $Effects.none};
-         case "ShowCart": return {ctor: "_Tuple2",_0: _U.update(model,{viewType: CartView}),_1: $Effects.none};
-         case "DeleteFromCart": var variants = A2(deleteFromCart,_p7._0,model.variants);
-           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
-         case "ChangeCount": var variants = A2($List.map,A2(changeCount,_p7._0,_p7._1),model.variants);
-           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
-         case "Toggle": return {ctor: "_Tuple2",_0: _U.update(model,{isShowed: $Basics.not(model.isShowed)}),_1: $Effects.none};
-         case "Email": return {ctor: "_Tuple2",_0: _U.update(model,{email: _p7._0}),_1: $Effects.none};
-         case "Name": return {ctor: "_Tuple2",_0: _U.update(model,{name: _p7._0}),_1: $Effects.none};
-         case "Checkout": return {ctor: "_Tuple2",_0: _U.update(model,{error: ""}),_1: toStripe(card)};
-         case "ResponseFromStripe": var _p12 = _p7._0;
-           if (_p12.ctor === "Ok") {
-                 return {ctor: "_Tuple2",_0: model,_1: A2(savePayment,_p12._0,model)};
-              } else {
-                 return {ctor: "_Tuple2",_0: _U.update(model,{error: A2($Maybe.withDefault,"",A2($Dict.get,_p12._0,errorMsg))}),_1: $Effects.none};
-              }
-         default: var _p13 = _p7._0;
-           if (_p13.ctor === "Ok") {
-                 return {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
-              } else {
-                 return {ctor: "_Tuple2",_0: _U.update(model,{error: "Неверный email или неуказано имя"}),_1: $Effects.none};
-              }}
-   });
    var recieveFromStripe = Elm.Native.Port.make(_elm).inboundSignal("recieveFromStripe",
    "Maybe.Maybe Cart.CardResponse",
    function (v) {
@@ -11547,22 +11473,101 @@ Elm.Cart.make = function (_elm) {
    });
    var fromStripe = function () {
       var toStripeAction = function (res) {
-         var _p14 = res;
-         if (_p14.ctor === "Nothing") {
+         var _p7 = res;
+         if (_p7.ctor === "Nothing") {
                return NoOp;
             } else {
-               var _p16 = _p14._0;
-               var _p15 = _p16.error;
-               if (_p15.ctor === "Nothing") {
-                     return ResponseFromStripe($Result.Ok(_p16.cardToken));
+               var _p9 = _p7._0;
+               var _p8 = _p9.error;
+               if (_p8.ctor === "Nothing") {
+                     return ResponseFromStripe($Result.Ok(_p9.cardToken));
                   } else {
-                     return ResponseFromStripe($Result.Err(_p15._0));
+                     return ResponseFromStripe($Result.Err(_p8._0));
                   }
             }
       };
       return A2($Signal.map,toStripeAction,recieveFromStripe);
    }();
    var CardResponse = F2(function (a,b) {    return {error: a,cardToken: b};});
+   var orderCreatedMailbox = $Signal.mailbox(false);
+   var toOrderCreated = function (isCreated) {
+      return $Effects.task(A2($Task.map,function (_p10) {    return NoOp;},A2($Signal.send,orderCreatedMailbox.address,isCreated)));
+   };
+   var update = F2(function (action,model) {
+      var card = model.card;
+      var _p11 = action;
+      switch (_p11.ctor)
+      {case "CardNumber": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cardNumber: _p11._0})}),_1: $Effects.none};
+         case "CardVerification": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cvc: _p11._0})}),_1: $Effects.none};
+         case "CardExpire": var changeCard = F2(function (m,y) {    return _U.update(card,{expMonth: m,expYear: y});});
+           var getYear = function (arr) {    return A2($Maybe.withDefault,"",$List.head(arr));};
+           var expArr = A2($String.split,"/",A2($Debug.log,"EXP => ",_p11._0));
+           var _p12 = expArr;
+           if (_p12.ctor === "::") {
+                 if (_p12._1.ctor === "[]") {
+                       var _p13 = _p12._0;
+                       return _U.eq($String.length(card.expYear),0) && !_U.eq($String.length(card.expMonth),1) ? {ctor: "_Tuple2"
+                                                                                                                 ,_0: _U.update(model,
+                                                                                                                 {card: A2(changeCard,
+                                                                                                                 A2($String.left,1,_p13),
+                                                                                                                 "")})
+                                                                                                                 ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                       ,_0: _U.update(model,
+                                                                                                                                       {card: A2(changeCard,
+                                                                                                                                       _p13,
+                                                                                                                                       "")})
+                                                                                                                                       ,_1: $Effects.none};
+                    } else {
+                       var _p15 = _p12._1;
+                       var _p14 = _p12._0;
+                       return _U.cmp($String.length(card.expYear),0) > 0 && _U.eq($String.length(getYear(_p15)),0) ? {ctor: "_Tuple2"
+                                                                                                                     ,_0: _U.update(model,
+                                                                                                                     {card: A2(changeCard,
+                                                                                                                     A2($String.left,1,_p14),
+                                                                                                                     "")})
+                                                                                                                     ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                           ,_0: _U.update(model,
+                                                                                                                                           {card: A2(changeCard,
+                                                                                                                                           _p14,
+                                                                                                                                           getYear(_p15))})
+                                                                                                                                           ,_1: $Effects.none};
+                    }
+              } else {
+                 return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+              }
+         case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "AddToCart": var variants = A2(addVariants,model.variants,_p11._0);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
+         case "ShowCheckout": return A2($List.any,function (variant) {    return _U.cmp(variant.count,variant.min) < 0;},model.variants) ? {ctor: "_Tuple2"
+                                                                                                                                           ,_0: _U.update(model,
+                                                                                                                                           {showError: true})
+                                                                                                                                           ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                                                 ,_0: _U.update(model,
+                                                                                                                                                                 {viewType: CheckoutView})
+                                                                                                                                                                 ,_1: $Effects.none};
+         case "ShowCart": return {ctor: "_Tuple2",_0: _U.update(model,{viewType: CartView}),_1: $Effects.none};
+         case "DeleteFromCart": var variants = A2(deleteFromCart,_p11._0,model.variants);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
+         case "ChangeCount": var variants = A2($List.map,A2(changeCount,_p11._0,_p11._1),model.variants);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
+         case "Toggle": return {ctor: "_Tuple2",_0: _U.update(model,{isShowed: $Basics.not(model.isShowed)}),_1: $Effects.none};
+         case "Email": return {ctor: "_Tuple2",_0: _U.update(model,{email: _p11._0}),_1: $Effects.none};
+         case "Name": return {ctor: "_Tuple2",_0: _U.update(model,{name: _p11._0}),_1: $Effects.none};
+         case "Checkout": return {ctor: "_Tuple2",_0: _U.update(model,{error: ""}),_1: toStripe(card)};
+         case "ResponseFromStripe": var _p16 = _p11._0;
+           if (_p16.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: model,_1: A2(savePayment,_p16._0,model)};
+              } else {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{error: A2($Maybe.withDefault,"",A2($Dict.get,_p16._0,errorMsg))}),_1: $Effects.none};
+              }
+         default: var _p17 = _p11._0;
+           if (_p17.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: initModel,_1: toOrderCreated(true)};
+              } else {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{error: "Неверный email или неуказано имя"}),_1: $Effects.none};
+              }}
+   });
+   var orderCreated = Elm.Native.Port.make(_elm).outboundSignal("orderCreated",function (v) {    return v;},orderCreatedMailbox.signal);
    var sendToStripe = Elm.Native.Port.make(_elm).outboundSignal("sendToStripe",
    function (v) {
       return {cardNumber: v.cardNumber,cvc: v.cvc,expMonth: v.expMonth,expYear: v.expYear};
@@ -11597,7 +11602,7 @@ Elm.Cart.make = function (_elm) {
          v);
       })) : _U.badPort("an array",v));
    });
-   var toAction = function (item) {    var _p17 = item;if (_p17.ctor === "Nothing") {    return NoOp;} else {    return AddToCart(_p17._0);}};
+   var toAction = function (item) {    var _p18 = item;if (_p18.ctor === "Nothing") {    return NoOp;} else {    return AddToCart(_p18._0);}};
    var toCartInput = A2($Signal.map,toAction,addToCart);
    var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([toCartInput,fromStripe])});
    var main = app.html;
@@ -11607,11 +11612,13 @@ Elm.Cart.make = function (_elm) {
                              ,main: main
                              ,toAction: toAction
                              ,toCartInput: toCartInput
+                             ,orderCreatedMailbox: orderCreatedMailbox
                              ,CardResponse: CardResponse
                              ,fromStripe: fromStripe
                              ,sendToStripeMailbox: sendToStripeMailbox
                              ,saveToStorageMailbox: saveToStorageMailbox
                              ,toStorage: toStorage
+                             ,toOrderCreated: toOrderCreated
                              ,toStripe: toStripe
                              ,Variant: Variant
                              ,Card: Card
