@@ -1,4 +1,5 @@
 nav {	
+  position: relative;
 	&.post-nav {
 		margin: em(30) 0;
 		border-bottom: 1px solid $base-border-color;
@@ -12,6 +13,10 @@ nav {
 				background-size: 100%;
 			}
 		}
+    .post_navigation {
+      display: inline-block;
+      position: relative;
+    }
 
 
 
@@ -19,6 +24,7 @@ nav {
 			.post_navigation {
 					float: right;		    			
 					margin-right: em(33);
+        
 			}
 			.post_nav_logo {
 				float: left;

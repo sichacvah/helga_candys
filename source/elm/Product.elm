@@ -84,7 +84,6 @@ type alias Model =
     , productId : Int
     , name : String
     , min : Int
-    , showError : Bool
     , variants : List Variant
     , showed : Bool
     }
@@ -107,7 +106,7 @@ type alias ProductFromServer =
 
 initModel : Model
 initModel =
-    Model 0 0 0 "" 0 False [] False
+    Model 0 0 0 "" 0 [] False
 
 
 init : ( Model, Effects Action )
@@ -217,10 +216,7 @@ update action model =
                     ( { model | showed = False }, Effects.none )
 
         AddToCart ->
-            if (List.any (\count -> count < model.min && count > 0) (List.map (\var -> var.count) model.variants)) then
-                ( { model | showError = True }, Effects.none )
-            else
-                ( model, toCart (List.filter (\variant -> variant.count > 0) model.variants) )
+            ( model, toCart (List.filter (\variant -> variant.count > 0) model.variants) )
 
         RequestProduct params ->
             ( { model
@@ -233,7 +229,7 @@ update action model =
             )
 
         ChangeCount variantId count ->
-            ( { model | showError = False, variants = List.map (changeCount variantId count) model.variants }, Effects.none )
+            ( { model | variants = List.map (changeCount variantId count) model.variants }, Effects.none )
 
         Hide ->
             ( { model | showed = False }, Effects.none )
@@ -263,50 +259,44 @@ isShowed showed =
         "none"
 
 
-productView : Signal.Address Action -> Bool -> Int -> Variant -> Html
-productView address needShowError min variant =
+productView : Signal.Address Action -> Int -> Variant -> Html
+productView address min variant =
     div
         [ classList [ ( "product-info", True ) ] ]
-        ((if needShowError && (min > variant.count) && (variant.count > 0) then
-            [ showError min ]
-          else
-            [ div [] [] ]
-         )
-            ++ [ img
-                    [ src variant.imageUrl
-                    , classList [ ( "three-column", True ) ]
+        [ img
+            [ src variant.imageUrl
+            , classList [ ( "three-column", True ) ]
+            ]
+            []
+        , div
+            [ classList [ ( "product-name", True ), ( "six-column", True ) ] ]
+            [ text (variant.name ++ ". " ++ variant.description)
+            , div
+                [ classList [ ( "product-count", True ) ] ]
+                [ input
+                    [ type' "number"
+                    , value (toString variant.count)
+                    , name "product_count"
+                    , Html.Attributes.min "0"
+                    , on
+                        "input"
+                        targetValue
+                        (\str ->
+                            case (String.toInt str) of
+                                Ok val ->
+                                    Signal.message address (ChangeCount variant.id val)
+
+                                _ ->
+                                    Signal.message address NoOp
+                        )
                     ]
                     []
-               , div
-                    [ classList [ ( "product-name", True ), ( "six-column", True ) ] ]
-                    [ text (variant.name ++ ". " ++ variant.description)
-                    , div
-                        [ classList [ ( "product-count", True ) ] ]
-                        [ input
-                            [ type' "number"
-                            , value (toString variant.count)
-                            , name "product_count"
-                            , Html.Attributes.min "0"
-                            , on
-                                "input"
-                                targetValue
-                                (\str ->
-                                    case (String.toInt str) of
-                                        Ok val ->
-                                            Signal.message address (ChangeCount variant.id val)
-
-                                        _ ->
-                                            Signal.message address NoOp
-                                )
-                            ]
-                            []
-                        ]
-                    ]
-               , div
-                    [ classList [ ( "product-price", True ), ( "three-column", True ) ] ]
-                    [ text ((toString variant.price) ++ " руб.") ]
-               ]
-        )
+                ]
+            ]
+        , div
+            [ classList [ ( "product-price", True ), ( "three-column", True ) ] ]
+            [ text ((toString variant.price) ++ " руб.") ]
+        ]
 
 
 showError : Int -> Html
@@ -342,7 +332,7 @@ view address model =
                 [ style [ ("margin-top" => "1em") ] ]
                 [ text ("Выберите вид :") ]
              ]
-                ++ (List.map (productView address model.showError model.min) model.variants)
+                ++ (List.map (productView address model.min) model.variants)
                 ++ [ button
                         [ Html.Events.onClick address (AddToCart) ]
                         [ text "В корзину" ]

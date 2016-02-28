@@ -11020,13 +11020,9 @@ Elm.Product.make = function (_elm) {
    var Hide = {ctor: "Hide"};
    var Show = function (a) {    return {ctor: "Show",_0: a};};
    var NoOp = {ctor: "NoOp"};
-   var productView = F4(function (address,needShowError,min,variant) {
+   var productView = F3(function (address,min,variant) {
       return A2($Html.div,
       _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-info",_1: true}]))]),
-      A2($Basics._op["++"],
-      needShowError && (_U.cmp(min,variant.count) > 0 && _U.cmp(variant.count,0) > 0) ? _U.list([showError(min)]) : _U.list([A2($Html.div,
-      _U.list([]),
-      _U.list([]))]),
       _U.list([A2($Html.img,
               _U.list([$Html$Attributes.src(variant.imageUrl),$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
               _U.list([]))
@@ -11054,7 +11050,7 @@ Elm.Product.make = function (_elm) {
                       _U.list([]))]))]))
               ,A2($Html.div,
               _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-price",_1: true},{ctor: "_Tuple2",_0: "three-column",_1: true}]))]),
-              _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price)," руб."))]))])));
+              _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price)," руб."))]))]));
    });
    var view = F2(function (address,model) {
       return A2($Html.div,
@@ -11074,7 +11070,7 @@ Elm.Product.make = function (_elm) {
               A2($Basics._op["++"],
               _U.list([A2($Html.h1,_U.list([$Html$Attributes.style(_U.list([A2(_op["=>"],"margin-top","1em")]))]),_U.list([$Html.text("Выберите вид :")]))]),
               A2($Basics._op["++"],
-              A2($List.map,A3(productView,address,model.showError,model.min),model.variants),
+              A2($List.map,A2(productView,address,model.min),model.variants),
               _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,AddToCart)]),_U.list([$Html.text("В корзину")]))]))))]));
    });
    var addToCartMailbox = $Signal.mailbox(_U.list([]));
@@ -11090,8 +11086,8 @@ Elm.Product.make = function (_elm) {
    addToCartMailbox.signal);
    var ProductFromServer = F4(function (a,b,c,d) {    return {name: a,id: b,min: c,variants: d};});
    var Product = F3(function (a,b,c) {    return {name: a,id: b,variants: c};});
-   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {left: a,top: b,productId: c,name: d,min: e,showError: f,variants: g,showed: h};});
-   var initModel = A8(Model,0,0,0,"",0,false,_U.list([]),false);
+   var Model = F7(function (a,b,c,d,e,f,g) {    return {left: a,top: b,productId: c,name: d,min: e,variants: f,showed: g};});
+   var initModel = A7(Model,0,0,0,"",0,_U.list([]),false);
    var init = {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
    var VariantWithoutCount = F5(function (a,b,c,d,e) {    return {id: a,name: b,description: c,price: d,imageUrl: e};});
    var productDecoder = A5($Json$Decode.object4,
@@ -11135,23 +11131,13 @@ Elm.Product.make = function (_elm) {
               } else {
                  return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};
               }
-         case "AddToCart": return A2($List.any,
-           function (count) {
-              return _U.cmp(count,model.min) < 0 && _U.cmp(count,0) > 0;
-           },
-           A2($List.map,function ($var) {    return $var.count;},model.variants)) ? {ctor: "_Tuple2"
-                                                                                    ,_0: _U.update(model,{showError: true})
-                                                                                    ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                                                          ,_0: model
-                                                                                                          ,_1: toCart(A2($List.filter,
-                                                                                                          function (variant) {
-                                                                                                             return _U.cmp(variant.count,0) > 0;
-                                                                                                          },
-                                                                                                          model.variants))};
+         case "AddToCart": return {ctor: "_Tuple2"
+                                  ,_0: model
+                                  ,_1: toCart(A2($List.filter,function (variant) {    return _U.cmp(variant.count,0) > 0;},model.variants))};
          case "RequestProduct": var _p5 = _p2._0;
            return {ctor: "_Tuple2",_0: _U.update(model,{productId: _p5.productId,left: _p5.left,top: _p5.top,showed: false}),_1: productRequest(_p5.productId)};
          case "ChangeCount": return {ctor: "_Tuple2"
-                                    ,_0: _U.update(model,{showError: false,variants: A2($List.map,A2(changeCount,_p2._0,_p2._1),model.variants)})
+                                    ,_0: _U.update(model,{variants: A2($List.map,A2(changeCount,_p2._0,_p2._1),model.variants)})
                                     ,_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: _U.update(model,{showed: false}),_1: $Effects.none};}
    });

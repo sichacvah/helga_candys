@@ -6,10 +6,14 @@ Elm.Cart.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -18,7 +22,20 @@ Elm.Cart.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var showCheckOut = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([]));});
+   var setExpValue = F2(function (month,year) {
+      return _U.cmp($String.length(month),2) > -1 ? A2($Basics._op["++"],month,A2($Basics._op["++"],"/",year)) : month;
+   });
+   var total = function (model) {
+      var subTotal = function (item) {    return $Basics.toFloat(item.count) * item.price;};
+      return $List.sum(A2($List.map,subTotal,model.variants));
+   };
+   var errorView = function (min) {
+      return _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "error",_1: true}]))]),
+      _U.list([$Html.text(A2($Basics._op["++"],
+      "Для совершения заказа этого товара должно быть не менее ",
+      A2($Basics._op["++"],$Basics.toString(min),"шт.")))]))]);
+   };
    var cartHead = A2($Html.div,
    _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-header",_1: true}]))]),
    _U.list([A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),_U.list([$Html.text("Товар")]))
@@ -26,28 +43,198 @@ Elm.Cart.make = function (_elm) {
            ,A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "two-column",_1: true}]))]),_U.list([$Html.text("Цена")]))
            ,A2($Html.div,_U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "one-column",_1: true}]))]),_U.list([]))]));
    var deleteFromCart = F2(function (variantId,variants) {    return A2($List.filter,function (item) {    return !_U.eq(item.id,variantId);},variants);});
-   var notInNew = function (_p0) {    var _p1 = _p0;return _p1._1;};
+   var increaseItemCount = F2(function (item1,item2) {    return _U.eq(item1.id,item2.id) ? _U.update(item2,{count: item1.count + item2.count}) : item2;});
+   var increaseItemsCount = F2(function (variant,variants) {    return A2($List.map,increaseItemCount(variant),variants);});
    var variantsIds = function (variants) {    return A2($List.map,function (_) {    return _.id;},variants);};
-   var inNew = F2(function (newVariants,variant) {    return A2($List.member,variant.id,variantsIds(newVariants));});
-   var addVariants = F2(function (variants,newVariants) {
-      return A2($Basics._op["++"],newVariants,notInNew(A2($List.partition,inNew(newVariants),variants)));
+   var inCart = F2(function (cartItems,variant) {    return A2($List.member,variant.id,variantsIds(cartItems));});
+   var addVariants = F2(function (oldVariants,newVariants) {
+      addVariants: while (true) {
+         var _p0 = newVariants;
+         if (_p0.ctor === "[]") {
+               return oldVariants;
+            } else {
+               var _p2 = _p0._1;
+               var _p1 = _p0._0;
+               if (A2(inCart,oldVariants,_p1)) {
+                     var _v1 = A2(increaseItemsCount,_p1,oldVariants),_v2 = _p2;
+                     oldVariants = _v1;
+                     newVariants = _v2;
+                     continue addVariants;
+                  } else {
+                     var _v3 = A2($List._op["::"],_p1,oldVariants),_v4 = _p2;
+                     oldVariants = _v3;
+                     newVariants = _v4;
+                     continue addVariants;
+                  }
+            }
+      }
    });
    var changeCount = F3(function (variantId,count,variant) {    return _U.eq(variant.id,variantId) ? _U.update(variant,{count: count}) : variant;});
+   var variantsToJson = function (variants) {
+      var encodeVariant = function (variant) {
+         return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "variant_id",_1: $Json$Encode.$int(variant.id)}
+                                            ,{ctor: "_Tuple2",_0: "count",_1: $Json$Encode.$int(variant.count)}]));
+      };
+      return A2($List.map,encodeVariant,variants);
+   };
+   var paymentToJson = F2(function (cardToken,model) {
+      var encoder = $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(model.name)}
+                                                ,{ctor: "_Tuple2",_0: "email",_1: $Json$Encode.string(model.email)}
+                                                ,{ctor: "_Tuple2",_0: "card_token",_1: $Json$Encode.string(cardToken)}
+                                                ,{ctor: "_Tuple2",_0: "order_items_attributes",_1: $Json$Encode.list(variantsToJson(model.variants))}]));
+      return A2($Json$Encode.encode,2,encoder);
+   });
+   var paymentPost = function (body) {
+      var request = {verb: "POST"
+                    ,headers: _U.list([{ctor: "_Tuple2",_0: "Content-Type",_1: "application/json"}])
+                    ,url: "http://localhost:3000/api/v1/orders/create"
+                    ,body: $Http.string(body)};
+      return A2($Http.fromJson,$Json$Decode.string,A2($Http.send,$Http.defaultSettings,request));
+   };
+   var safePost = function (body) {    return $Task.toResult(paymentPost(body));};
+   var errorMsg = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "invalid_number",_1: "Неправильный номер карты"}
+                                         ,{ctor: "_Tuple2",_0: "invalid_expiry_year",_1: "Неверный год окончания срока действия карты"}
+                                         ,{ctor: "_Tuple2",_0: "invalid_expiry_month",_1: "Неверный месяц окончания срока действия карты"}
+                                         ,{ctor: "_Tuple2",_0: "invalid_cvc",_1: "Неправильный CVC"}]));
    var CheckoutView = {ctor: "CheckoutView"};
    var CartView = {ctor: "CartView"};
+   var RecievePaymentResponse = function (a) {    return {ctor: "RecievePaymentResponse",_0: a};};
+   var savePayment = F2(function (cardToken,model) {
+      return $Effects.task(A2($Task.map,RecievePaymentResponse,safePost(A2(paymentToJson,cardToken,model))));
+   });
+   var ResponseFromStripe = function (a) {    return {ctor: "ResponseFromStripe",_0: a};};
+   var Checkout = {ctor: "Checkout"};
+   var Email = function (a) {    return {ctor: "Email",_0: a};};
+   var Name = function (a) {    return {ctor: "Name",_0: a};};
+   var CardExpire = function (a) {    return {ctor: "CardExpire",_0: a};};
+   var CardVerification = function (a) {    return {ctor: "CardVerification",_0: a};};
+   var CardNumber = function (a) {    return {ctor: "CardNumber",_0: a};};
    var ChangeCount = F2(function (a,b) {    return {ctor: "ChangeCount",_0: a,_1: b};});
    var DeleteFromCart = function (a) {    return {ctor: "DeleteFromCart",_0: a};};
-   var Checkout = {ctor: "Checkout"};
+   var ShowCart = {ctor: "ShowCart"};
+   var showCheckOut = F2(function (address,model) {
+      if (model.isShowed) {
+            var card = model.card;
+            return A2($Html.div,
+            _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-checkout",_1: true}]))]),
+            _U.list([A2($Html.div,
+            _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "checkout-form",_1: true}]))]),
+            _U.list([A2($Html.div,
+                    _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "error",_1: true}]))]),
+                    _U.list([$Html.text(_U.cmp($String.length(model.error),0) > 0 ? model.error : "")]))
+                    ,A2($Html.form,
+                    _U.list([$Html$Attributes.method("POST")]),
+                    _U.list([A2($Html.fieldset,
+                            _U.list([]),
+                            _U.list([A2($Html.input,
+                                    _U.list([$Html$Attributes.name("name")
+                                            ,A3($Html$Events.on,
+                                            "input",
+                                            $Html$Events.targetValue,
+                                            function (name) {
+                                               return A2($Signal.message,address,Name(name));
+                                            })
+                                            ,$Html$Attributes.value(model.name)
+                                            ,$Html$Attributes.type$("text")
+                                            ,$Html$Attributes.placeholder("Ваше имя")
+                                            ,$Html$Attributes.required(true)]),
+                                    _U.list([]))
+                                    ,A2($Html.input,
+                                    _U.list([$Html$Attributes.name("email")
+                                            ,A3($Html$Events.on,
+                                            "input",
+                                            $Html$Events.targetValue,
+                                            function (email) {
+                                               return A2($Signal.message,address,Email(email));
+                                            })
+                                            ,$Html$Attributes.value(model.email)
+                                            ,$Html$Attributes.type$("email")
+                                            ,$Html$Attributes.placeholder("Ваш еmail")
+                                            ,$Html$Attributes.required(true)]),
+                                    _U.list([]))
+                                    ,A2($Html.input,
+                                    _U.list([$Html$Attributes.name("cardNumber")
+                                            ,A3($Html$Events.on,
+                                            "input",
+                                            $Html$Events.targetValue,
+                                            function (num) {
+                                               return A2($Signal.message,address,CardNumber(num));
+                                            })
+                                            ,$Html$Attributes.value(card.cardNumber)
+                                            ,$Html$Attributes.placeholder("Номер карты")
+                                            ,$Html$Attributes.type$("tel")
+                                            ,$Html$Attributes.required(true)]),
+                                    _U.list([]))
+                                    ,A2($Html.input,
+                                    _U.list([$Html$Attributes.name("cvc")
+                                            ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "50%"},{ctor: "_Tuple2",_0: "float",_1: "left"}]))
+                                            ,A3($Html$Events.on,
+                                            "input",
+                                            $Html$Events.targetValue,
+                                            function (cvc) {
+                                               return A2($Signal.message,address,CardVerification(cvc));
+                                            })
+                                            ,$Html$Attributes.value(card.cvc)
+                                            ,$Html$Attributes.placeholder("CVC")
+                                            ,$Html$Attributes.maxlength(4)
+                                            ,$Html$Attributes.type$("tel")
+                                            ,$Html$Attributes.required(true)]),
+                                    _U.list([]))
+                                    ,A2($Html.input,
+                                    _U.list([$Html$Attributes.name("exp")
+                                            ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "50%"}]))
+                                            ,A3($Html$Events.on,
+                                            "input",
+                                            $Html$Events.targetValue,
+                                            function (exp) {
+                                               return A2($Signal.message,address,CardExpire(exp));
+                                            })
+                                            ,$Html$Attributes.maxlength(7)
+                                            ,$Html$Attributes.placeholder("ММ/ГГГГ")
+                                            ,$Html$Attributes.type$("text")
+                                            ,$Html$Attributes.value(A2(setExpValue,card.expMonth,card.expYear))
+                                            ,$Html$Attributes.required(true)]),
+                                    _U.list([]))]))
+                            ,A2($Html.a,_U.list([A2($Html$Events.onClick,address,ShowCart)]),_U.list([$Html.text("Товары")]))
+                            ,A2($Html.button,
+                            _U.list([$Html$Attributes.type$("button"),A2($Html$Events.onClick,address,Checkout)]),
+                            _U.list([$Html.text(A2($Basics._op["++"],"Оплатить ",A2($Basics._op["++"],$Basics.toString(total(model)),"руб.")))]))]))]))]));
+         } else return A2($Html.div,_U.list([]),_U.list([]));
+   });
+   var ShowCheckout = {ctor: "ShowCheckout"};
    var Toggle = {ctor: "Toggle"};
+   var overlayDiv = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "position",_1: "fixed"}
+                                              ,{ctor: "_Tuple2",_0: "display",_1: model.isShowed ? "block" : "none"}
+                                              ,{ctor: "_Tuple2",_0: "left",_1: "0"}
+                                              ,{ctor: "_Tuple2",_0: "background",_1: "transparent"}
+                                              ,{ctor: "_Tuple2",_0: "bottom",_1: "0"}
+                                              ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
+                                              ,{ctor: "_Tuple2",_0: "height",_1: "100%"}]))
+              ,A2($Html$Events.onClick,address,Toggle)
+              ,$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-overlay",_1: true}]))]),
+      _U.list([]));
+   });
    var AddToCart = function (a) {    return {ctor: "AddToCart",_0: a};};
    var NoOp = {ctor: "NoOp"};
-   var itemView = F2(function (address,variant) {
+   var itemView = F3(function (address,showError,variant) {
       return A2($Html.div,
       _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-product",_1: true}]))]),
+      A2($Basics._op["++"],
+      showError && _U.cmp(variant.count,variant.min) < 0 ? errorView(variant.min) : _U.list([]),
       _U.list([A2($Html.div,
               _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "six-column",_1: true}]))]),
-              _U.list([A2($Html.img,
-                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "four-column",_1: true}])),$Html$Attributes.src(variant.imageUrl)]),
+              _U.list([A2($Html.div,
+                      _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "four-column",_1: true}]))
+                              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                               ,_0: "background-image"
+                                                               ,_1: A2($Basics._op["++"],"url(\'",A2($Basics._op["++"],variant.imageUrl,"\')"))}
+                                                              ,{ctor: "_Tuple2",_0: "width",_1: "50px"}
+                                                              ,{ctor: "_Tuple2",_0: "height",_1: "50px"}
+                                                              ,{ctor: "_Tuple2",_0: "background-repeat",_1: "no-repeat"}
+                                                              ,{ctor: "_Tuple2",_0: "background-size",_1: "cover"}
+                                                              ,{ctor: "_Tuple2",_0: "background-position",_1: "center"}]))]),
                       _U.list([]))
                       ,A2($Html.div,
                       _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "eight-column",_1: true}]))]),
@@ -63,9 +250,9 @@ Elm.Cart.make = function (_elm) {
                       "input",
                       $Html$Events.targetValue,
                       function (str) {
-                         var _p2 = $String.toInt(str);
-                         if (_p2.ctor === "Ok") {
-                               return A2($Signal.message,address,A2(ChangeCount,variant.id,_p2._0));
+                         var _p3 = $String.toInt(str);
+                         if (_p3.ctor === "Ok") {
+                               return A2($Signal.message,address,A2(ChangeCount,variant.id,_p3._0));
                             } else {
                                return A2($Signal.message,address,NoOp);
                             }
@@ -77,7 +264,7 @@ Elm.Cart.make = function (_elm) {
               _U.list([$Html.text(A2($Basics._op["++"],$Basics.toString(variant.price),"руб."))]))
               ,A2($Html.div,
               _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "one-column",_1: true}]))]),
-              _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,DeleteFromCart(variant.id))]),_U.list([$Html.text("×")]))]))]));
+              _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,DeleteFromCart(variant.id))]),_U.list([$Html.text("×")]))]))])));
    });
    var showCart = F2(function (address,model) {
       return model.isShowed ? A2($Html.div,
@@ -85,21 +272,19 @@ Elm.Cart.make = function (_elm) {
       A2($Basics._op["++"],
       _U.list([cartHead]),
       A2($Basics._op["++"],
-      A2($List.map,itemView(address),model.variants),
+      A2($List.map,A2(itemView,address,model.showError),model.variants),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-top",_1: "20px"}]))]),
-      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Checkout)]),_U.list([$Html.text("Оплатить")]))
+      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,ShowCheckout)]),_U.list([$Html.text("Оплатить")]))
               ,A2($Html.div,
-              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "float",_1: "right"}]))]),
-              _U.list([$Html.text(A2($Basics._op["++"],
-              "Итого: ",
-              A2($Basics._op["++"],
-              $Basics.toString($List.sum(A2($List.map,function (item) {    return $Basics.toFloat(item.count) * item.price;},model.variants))),
-              "руб.")))]))]))])))) : A2($Html.div,_U.list([]),_U.list([]));
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "float",_1: "right"},{ctor: "_Tuple2",_0: "margin-top",_1: "10px"}]))]),
+              _U.list([$Html.text(A2($Basics._op["++"],"Итого: ",A2($Basics._op["++"],$Basics.toString(total(model)),"руб.")))]))]))])))) : A2($Html.div,
+      _U.list([]),
+      _U.list([]));
    });
    var getView = F2(function (address,model) {
-      var _p3 = model.viewType;
-      if (_p3.ctor === "CartView") {
+      var _p4 = model.viewType;
+      if (_p4.ctor === "CartView") {
             return A2(showCart,address,model);
          } else {
             return A2(showCheckOut,address,model);
@@ -108,17 +293,7 @@ Elm.Cart.make = function (_elm) {
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "position",_1: "fixed"}
-                                                      ,{ctor: "_Tuple2",_0: "display",_1: model.isShowed ? "block" : "none"}
-                                                      ,{ctor: "_Tuple2",_0: "left",_1: "0"}
-                                                      ,{ctor: "_Tuple2",_0: "background",_1: "transparent"}
-                                                      ,{ctor: "_Tuple2",_0: "bottom",_1: "0"}
-                                                      ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
-                                                      ,{ctor: "_Tuple2",_0: "height",_1: "100%"}]))
-                      ,A2($Html$Events.onClick,address,Toggle)
-                      ,$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "product-overlay",_1: true}]))]),
-              _U.list([]))
+      _U.list([A2(overlayDiv,address,model)
               ,A2($Html.div,
               _U.list([$Html$Attributes.classList(_U.list([{ctor: "_Tuple2",_0: "cart-container",_1: true}]))
                       ,$Html$Attributes.style(_U.list([$List.isEmpty(model.variants) ? {ctor: "_Tuple2",_0: "display",_1: "none"} : {ctor: "_Tuple2"
@@ -130,27 +305,126 @@ Elm.Cart.make = function (_elm) {
               _U.list([]))]),
               _U.list([A2(getView,address,model)])))]));
    });
-   var Model = F5(function (a,b,c,d,e) {    return {clientEmail: a,clientName: b,variants: c,isShowed: d,viewType: e};});
-   var initModel = A5(Model,"","",_U.list([]),false,CartView);
+   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {email: a,name: b,variants: c,isShowed: d,viewType: e,showError: f,card: g,error: h};});
+   var Card = F4(function (a,b,c,d) {    return {cardNumber: a,cvc: b,expMonth: c,expYear: d};});
+   var initModel = A8(Model,"","",_U.list([]),false,CartView,false,A4(Card,"","","",""),"");
    var init = {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
    var Variant = F7(function (a,b,c,d,e,f,g) {    return {id: a,name: b,description: c,price: d,imageUrl: e,count: f,min: g};});
    var saveToStorageMailbox = $Signal.mailbox(_U.list([]));
    var toStorage = function (variants) {
-      return $Effects.task(A2($Task.map,function (_p4) {    return NoOp;},A2($Signal.send,saveToStorageMailbox.address,variants)));
+      return $Effects.task(A2($Task.map,function (_p5) {    return NoOp;},A2($Signal.send,saveToStorageMailbox.address,variants)));
+   };
+   var sendToStripeMailbox = $Signal.mailbox(A4(Card,"","","",""));
+   var toStripe = function (card) {
+      return $Effects.task(A2($Task.map,function (_p6) {    return NoOp;},A2($Signal.send,sendToStripeMailbox.address,card)));
    };
    var update = F2(function (action,model) {
-      var _p5 = action;
-      switch (_p5.ctor)
-      {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "AddToCart": var variants = A2(addVariants,model.variants,_p5._0);
+      var card = model.card;
+      var _p7 = action;
+      switch (_p7.ctor)
+      {case "CardNumber": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cardNumber: _p7._0})}),_1: $Effects.none};
+         case "CardVerification": return {ctor: "_Tuple2",_0: _U.update(model,{card: _U.update(card,{cvc: _p7._0})}),_1: $Effects.none};
+         case "CardExpire": var changeCard = F2(function (m,y) {    return _U.update(card,{expMonth: m,expYear: y});});
+           var getYear = function (arr) {    return A2($Maybe.withDefault,"",$List.head(arr));};
+           var expArr = A2($String.split,"/",A2($Debug.log,"EXP => ",_p7._0));
+           var _p8 = expArr;
+           if (_p8.ctor === "::") {
+                 if (_p8._1.ctor === "[]") {
+                       var _p9 = _p8._0;
+                       return _U.eq($String.length(card.expYear),0) && !_U.eq($String.length(card.expMonth),1) ? {ctor: "_Tuple2"
+                                                                                                                 ,_0: _U.update(model,
+                                                                                                                 {card: A2(changeCard,
+                                                                                                                 A2($String.left,1,_p9),
+                                                                                                                 "")})
+                                                                                                                 ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                       ,_0: _U.update(model,
+                                                                                                                                       {card: A2(changeCard,
+                                                                                                                                       _p9,
+                                                                                                                                       "")})
+                                                                                                                                       ,_1: $Effects.none};
+                    } else {
+                       var _p11 = _p8._1;
+                       var _p10 = _p8._0;
+                       return _U.cmp($String.length(card.expYear),0) > 0 && _U.eq($String.length(getYear(_p11)),0) ? {ctor: "_Tuple2"
+                                                                                                                     ,_0: _U.update(model,
+                                                                                                                     {card: A2(changeCard,
+                                                                                                                     A2($String.left,1,_p10),
+                                                                                                                     "")})
+                                                                                                                     ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                           ,_0: _U.update(model,
+                                                                                                                                           {card: A2(changeCard,
+                                                                                                                                           _p10,
+                                                                                                                                           getYear(_p11))})
+                                                                                                                                           ,_1: $Effects.none};
+                    }
+              } else {
+                 return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+              }
+         case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "AddToCart": var variants = A2(addVariants,model.variants,_p7._0);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
+         case "ShowCheckout": return A2($List.any,function (variant) {    return _U.cmp(variant.count,variant.min) < 0;},model.variants) ? {ctor: "_Tuple2"
+                                                                                                                                           ,_0: _U.update(model,
+                                                                                                                                           {showError: true})
+                                                                                                                                           ,_1: $Effects.none} : {ctor: "_Tuple2"
+                                                                                                                                                                 ,_0: _U.update(model,
+                                                                                                                                                                 {viewType: CheckoutView})
+                                                                                                                                                                 ,_1: $Effects.none};
+         case "ShowCart": return {ctor: "_Tuple2",_0: _U.update(model,{viewType: CartView}),_1: $Effects.none};
+         case "DeleteFromCart": var variants = A2(deleteFromCart,_p7._0,model.variants);
            return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
-         case "Checkout": return {ctor: "_Tuple2",_0: _U.update(model,{viewType: CheckoutView}),_1: $Effects.none};
-         case "DeleteFromCart": var variants = A2(deleteFromCart,_p5._0,model.variants);
-           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
-         case "ChangeCount": var variants = A2($List.map,A2(changeCount,_p5._0,_p5._1),model.variants);
-           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants}),_1: toStorage(variants)};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{isShowed: $Basics.not(model.isShowed)}),_1: $Effects.none};}
+         case "ChangeCount": var variants = A2($List.map,A2(changeCount,_p7._0,_p7._1),model.variants);
+           return {ctor: "_Tuple2",_0: _U.update(model,{variants: variants,showError: false}),_1: toStorage(variants)};
+         case "Toggle": return {ctor: "_Tuple2",_0: _U.update(model,{isShowed: $Basics.not(model.isShowed)}),_1: $Effects.none};
+         case "Email": return {ctor: "_Tuple2",_0: _U.update(model,{email: _p7._0}),_1: $Effects.none};
+         case "Name": return {ctor: "_Tuple2",_0: _U.update(model,{name: _p7._0}),_1: $Effects.none};
+         case "Checkout": return {ctor: "_Tuple2",_0: _U.update(model,{error: ""}),_1: toStripe(card)};
+         case "ResponseFromStripe": var _p12 = _p7._0;
+           if (_p12.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: model,_1: A2(savePayment,_p12._0,model)};
+              } else {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{error: A2($Maybe.withDefault,"",A2($Dict.get,_p12._0,errorMsg))}),_1: $Effects.none};
+              }
+         default: var _p13 = _p7._0;
+           if (_p13.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: initModel,_1: $Effects.none};
+              } else {
+                 return {ctor: "_Tuple2",_0: _U.update(model,{error: "Неверный email или неуказано имя"}),_1: $Effects.none};
+              }}
    });
+   var recieveFromStripe = Elm.Native.Port.make(_elm).inboundSignal("recieveFromStripe",
+   "Maybe.Maybe Cart.CardResponse",
+   function (v) {
+      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "object" && "error" in v && "cardToken" in v ? {_: {}
+                                                                                                                                               ,error: v.error === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v.error === "string" || typeof v.error === "object" && v.error instanceof String ? v.error : _U.badPort("a string",
+                                                                                                                                               v.error))
+                                                                                                                                               ,cardToken: typeof v.cardToken === "string" || typeof v.cardToken === "object" && v.cardToken instanceof String ? v.cardToken : _U.badPort("a string",
+                                                                                                                                               v.cardToken)} : _U.badPort("an object with fields `error`, `cardToken`",
+      v));
+   });
+   var fromStripe = function () {
+      var toStripeAction = function (res) {
+         var _p14 = res;
+         if (_p14.ctor === "Nothing") {
+               return NoOp;
+            } else {
+               var _p16 = _p14._0;
+               var _p15 = _p16.error;
+               if (_p15.ctor === "Nothing") {
+                     return ResponseFromStripe($Result.Ok(_p16.cardToken));
+                  } else {
+                     return ResponseFromStripe($Result.Err(_p15._0));
+                  }
+            }
+      };
+      return A2($Signal.map,toStripeAction,recieveFromStripe);
+   }();
+   var CardResponse = F2(function (a,b) {    return {error: a,cardToken: b};});
+   var sendToStripe = Elm.Native.Port.make(_elm).outboundSignal("sendToStripe",
+   function (v) {
+      return {cardNumber: v.cardNumber,cvc: v.cvc,expMonth: v.expMonth,expYear: v.expYear};
+   },
+   sendToStripeMailbox.signal);
    var saveToStorage = Elm.Native.Port.make(_elm).outboundSignal("saveToStorage",
    function (v) {
       return Elm.Native.List.make(_elm).toArray(v).map(function (v) {
@@ -180,9 +454,9 @@ Elm.Cart.make = function (_elm) {
          v);
       })) : _U.badPort("an array",v));
    });
-   var toAction = function (item) {    var _p6 = item;if (_p6.ctor === "Nothing") {    return NoOp;} else {    return AddToCart(_p6._0);}};
+   var toAction = function (item) {    var _p17 = item;if (_p17.ctor === "Nothing") {    return NoOp;} else {    return AddToCart(_p17._0);}};
    var toCartInput = A2($Signal.map,toAction,addToCart);
-   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([toCartInput])});
+   var app = $StartApp.start({init: init,update: update,view: view,inputs: _U.list([toCartInput,fromStripe])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    return _elm.Cart.values = {_op: _op
@@ -190,31 +464,56 @@ Elm.Cart.make = function (_elm) {
                              ,main: main
                              ,toAction: toAction
                              ,toCartInput: toCartInput
+                             ,CardResponse: CardResponse
+                             ,fromStripe: fromStripe
+                             ,sendToStripeMailbox: sendToStripeMailbox
                              ,saveToStorageMailbox: saveToStorageMailbox
                              ,toStorage: toStorage
+                             ,toStripe: toStripe
                              ,Variant: Variant
+                             ,Card: Card
                              ,Model: Model
                              ,initModel: initModel
                              ,init: init
                              ,NoOp: NoOp
                              ,AddToCart: AddToCart
                              ,Toggle: Toggle
-                             ,Checkout: Checkout
+                             ,ShowCheckout: ShowCheckout
+                             ,ShowCart: ShowCart
                              ,DeleteFromCart: DeleteFromCart
                              ,ChangeCount: ChangeCount
+                             ,CardNumber: CardNumber
+                             ,CardVerification: CardVerification
+                             ,CardExpire: CardExpire
+                             ,Name: Name
+                             ,Email: Email
+                             ,Checkout: Checkout
+                             ,ResponseFromStripe: ResponseFromStripe
+                             ,RecievePaymentResponse: RecievePaymentResponse
                              ,CartView: CartView
                              ,CheckoutView: CheckoutView
+                             ,errorMsg: errorMsg
                              ,update: update
+                             ,savePayment: savePayment
+                             ,safePost: safePost
+                             ,paymentPost: paymentPost
+                             ,paymentToJson: paymentToJson
+                             ,variantsToJson: variantsToJson
                              ,changeCount: changeCount
-                             ,inNew: inNew
+                             ,inCart: inCart
                              ,variantsIds: variantsIds
                              ,addVariants: addVariants
-                             ,notInNew: notInNew
+                             ,increaseItemCount: increaseItemCount
+                             ,increaseItemsCount: increaseItemsCount
                              ,deleteFromCart: deleteFromCart
                              ,cartHead: cartHead
+                             ,errorView: errorView
                              ,itemView: itemView
+                             ,overlayDiv: overlayDiv
                              ,view: view
+                             ,total: total
                              ,showCart: showCart
                              ,getView: getView
+                             ,setExpValue: setExpValue
                              ,showCheckOut: showCheckOut};
 };

@@ -14,6 +14,11 @@
   
 }
 
+.error {
+  color: $action-color;
+  margin-top: -15px;
+}
+
 .product-overlay {
   z-index: 5000;
   background-color:black;
@@ -51,20 +56,43 @@
   margin-top: 1em;
   margin-bottom: 1em;
 }
+.cvc {
+    float: right;
 
+  }
 #cart {
   text-align: left;
   box-shadow: 0 2px 4px rgba(41, 63, 84, 0.24), 0 2px 6px rgba(41, 63, 84, 0.12);
+  .cart-checkout {
+    .checkout-form {
+      text-align: center;
+      a {
+        display: block;
+        margin: .5em 0;
+        color: $action-color;
+        cursor: pointer;
+      }
+      width: 20%;
+      left: 40%;
+      position: fixed;
+      z-index: 50001;
+      padding: 2em;
+      background: white;
+
+      box-shadow: 0 2px 4px rgba(41, 63, 84, 0.24), 0 2px 6px rgba(41, 63, 84, 0.12);
+      
+    }
+  }
+  
 
   .cart-items {
+    width: 100%;
     z-index: 50001;
     background-color: white;
     img {
       display: none;
     }
     @include media($large-screen) {
-      width: 30%;
-      left: 35%;
       img {
         display: block;
       }
@@ -99,6 +127,7 @@
     }
   }
   .cart-button {
+    cursor: pointer;
     width: 30px;
     height: 30px;
     background-image: url('../images/paper-bag.svg');
